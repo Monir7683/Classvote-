@@ -4,82 +4,253 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ClassVote 🏆</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg,#ffe0f0,#dcd5ff);
-  margin: 0;
-  padding: 20px;
-  text-align: center;
-  color: #393052;
-}
-header {
-  background: white;
-  padding: 25px;
-  border-radius: 25px;
-  margin-bottom: 20px;
-}
-h1 { color: #8155d9; font-size: 36px; }
-.card {
-  background: white;
-  padding: 20px;
-  margin: 15px auto;
-  max-width: 400px;
-  border-radius: 20px;
-  box-shadow: 0 5px 15px #0001;
-}
-button {
-  background: #895ce0;
-  color: white;
-  border: 0;
-  border-radius: 15px;
-  padding: 12px 20px;
-  font-size: 16px;
-  margin: 5px;
-}
-input {
-  padding: 12px;
-  border: 2px solid #ddd;
-  border-radius: 12px;
-  width: 80%;
-  margin: 8px;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#d9c8ff,#ffd6e7,#c9f3ff);color:#292342;min-height:100vh;padding:20px}
+main{max-width:750px;margin:25px auto;background:white;padding:25px;border-radius:24px;box-shadow:0 8px 30px #55447722}
+h1{text-align:center;font-size:38px;margin-bottom:5px}
+.subtitle{text-align:center;color:#716b83;margin-bottom:25px}
+.card{background:#f7f4ff;border-radius:16px;padding:18px;margin:14px 0}
+input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin:7px 0;font-size:16px}
+button{background:#7554d9;color:white;border:0;font-weight:bold;cursor:pointer}
+button:hover{opacity:.85}
+.secondary{background:#ded7f7;color:#33265b}
+.danger{background:#d95770}
+.hidden{display:none}
+.row{display:flex;gap:8px;align-items:center}
+.row button{width:auto}
+.vote-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:15px;margin:12px 0}
+small{color:#716b83}
+#message{font-weight:bold;text-align:center;margin:12px}
 </style>
 </head>
 <body>
-
-<header>
+<main>
 <h1>🏆 ClassVote</h1>
-<p>Vote for your class legends!</p>
-</header>
+<p class="subtitle">Vote for your class legends!</p>
 
-<div class="card">
-<h2>😂 Who is the funniest?</h2>
-<input id="name" placeholder="Enter a classmate's name">
-<br>
-<button onclick="vote()">Vote!</button>
-<p id="message"></p>
-</div>
+<div id="message"></div>
 
-<div class="card">
-<h2>🌟 More awards coming soon!</h2>
-<p>Best at sports ⚽</p>
-<p>Biggest gamer 🎮</p>
-<p>Best style 😎</p>
-</div>
+<section id="voting">
+  <div class="card">
+    <h2>🗳️ Cast your votes</h2>
+    <p>Choose your name and vote for someone in each category.</p>
+    <small>Names are selected by users and are not independently verified.</small>
+    <label>Your name</label>
+    <select id="voter"><option value="">Loading classmates...</option></select>
+  </div>
+  <div id="questions"></div>
+  <button id="submitVote">Submit my votes 🎉</button>
+</section>
+
+<hr>
+
+<section id="login">
+  <h2>🔐 Admin login</h2>
+  <input id="email" type="email" placeholder="Admin email">
+  <input id="password" type="password" placeholder="Admin password">
+  <button id="loginButton">Log in</button>
+</section>
+
+<section id="admin" class="hidden">
+  <h2>⚙️ Admin dashboard</h2>
+  <button class="secondary" id="logoutButton">Log out</button>
+
+  <div class="card">
+    <h3>👥 Classmates</h3>
+    <input id="newName" placeholder="Classmate name">
+    <button id="addName">Add classmate</button>
+    <div id="nameList"></div>
+  </div>
+
+  <div class="card">
+    <h3>✨ Award categories</h3>
+    <input id="newQuestion" placeholder="Example: Who is the funniest?">
+    <button id="addQuestion">Add category</button>
+    <div id="questionList"></div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Votes</h3>
+    <button id="refreshVotes" class="secondary">Refresh votes</button>
+    <div id="voteList"></div>
+  </div>
+</section>
+</main>
 
 <script>
-function vote() {
- const name = document.getElementById("name").value.trim();
- if (!name) {
-  document.getElementById("message").textContent =
-   "Please enter a name!";
-  return;
- }
- document.getElementById("message").textContent =
-   "Thanks for voting! 🎉";
-}
-</script>
+const SUPABASE_URL = "https://hizetgeoucdktezbokab.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_2WZ2SqKarfjnYmzH5Luffw_BbeQBXki ";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let classmates = [];
+let questions = [];
+let currentUser = null;
+
+const $ = id => document.getElementById(id);
+const say = message => $("message").textContent = message;
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+async function loadPublicData() {
+  const [c,q] = await Promise.all([
+    db.from("classmates").select("id,name").order("name"),
+    db.from("questions").select("id,question,active").eq("active",true)
+  ]);
+  if(c.error || q.error) { say("Could not load the voting page."); return; }
+  classmates = c.data || [];
+  questions = q.data || [];
+  $("voter").innerHTML = '<option value="">Choose your name</option>' +
+    classmates.map(x => `<option value="${x.id}">${escapeHTML(x.name)}</option>`).join("");
+  $("questions").innerHTML = questions.map(q => `
+    <div class="vote-card">
+      <h3>${escapeHTML(q.question)}</h3>
+      <select class="nominee" data-question="${q.id}">
+        <option value="">Choose someone</option>
+        ${classmates.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("")}
+      </select>
+    </div>`).join("");
+}
+
+$("submitVote").onclick = async () => {
+  const voter = $("voter").value;
+  const choices = [...document.querySelectorAll(".nominee")];
+  if(!voter) return say("Please choose your name first.");
+  if(!choices.length) return say("There are no active categories yet.");
+  if(choices.some(x => !x.value)) return say("Please answer every category.");
+  $("submitVote").disabled = true;
+  for(const choice of choices) {
+    const {error} = await db.rpc("submit_vote", {
+      p_voter_id:voter,
+      p_nominee_id:choice.value,
+      p_question_id:choice.dataset.question
+    });
+    if(error) {
+      say(error.code === "23505"
+        ? "You have already voted in one of these categories."
+        : "Could not submit votes: " + error.message);
+      $("submitVote").disabled = false;
+      return;
+    }
+  }
+  say("Thank you! Your votes have been submitted 🎉");
+  $("voting").classList.add("hidden");
+};
+
+$("loginButton").onclick = async () => {
+  const {data,error} = await db.auth.signInWithPassword({
+    email:$("email").value,
+    password:$("password").value
+  });
+  if(error) return say("Login failed. Check your email and password.");
+  currentUser = data.user;
+  showAdmin();
+};
+
+async function showAdmin() {
+  $("login").classList.add("hidden");
+  $("admin").classList.remove("hidden");
+  await loadAdmin();
+}
+
+$("logoutButton").onclick = async () => {
+  await db.auth.signOut();
+  currentUser = null;
+  $("admin").classList.add("hidden");
+  $("login").classList.remove("hidden");
+};
+
+async function loadAdmin() {
+  await loadPublicData();
+  $("nameList").innerHTML = classmates.map(c => `
+    <div class="row">
+      <span>${escapeHTML(c.name)}</span>
+      <button class="danger" onclick="removeName('${c.id}')">Delete</button>
+    </div>`).join("");
+
+  const {data,error} = await db.from("questions").select("*").order("question");
+  if(error) { say("Could not load categories."); return; }
+  $("questionList").innerHTML = data.map(q => `
+    <div class="row">
+      <span>${escapeHTML(q.question)} ${q.active ? "🟢" : "⚪"}</span>
+      <button class="secondary" onclick="toggleQuestion('${q.id}',${!q.active})">
+        ${q.active ? "Close" : "Open"}
+      </button>
+      <button class="danger" onclick="removeQuestion('${q.id}')">Delete</button>
+    </div>`).join("");
+  await loadVotes();
+}
+
+$("addName").onclick = async () => {
+  const name = $("newName").value.trim();
+  if(!name) return;
+  const {error} = await db.from("classmates").insert({name});
+  if(error) return say("Could not add name: " + error.message);
+  $("newName").value = "";
+  await loadAdmin();
+};
+
+window.removeName = async id => {
+  if(!confirm("Delete this classmate?")) return;
+  const {error} = await db.from("classmates").delete().eq("id",id);
+  if(error) return say("Could not delete. This classmate may already have votes.");
+  await loadAdmin();
+};
+
+$("addQuestion").onclick = async () => {
+  const question = $("newQuestion").value.trim();
+  if(!question) return;
+  const {error} = await db.from("questions").insert({question});
+  if(error) return say("Could not add category: " + error.message);
+  $("newQuestion").value = "";
+  await loadAdmin();
+};
+
+window.toggleQuestion = async (id,active) => {
+  const {error} = await db.from("questions").update({active}).eq("id",id);
+  if(error) return say("Could not update category.");
+  await loadAdmin();
+};
+
+window.removeQuestion = async id => {
+  if(!confirm("Delete this category?")) return;
+  const {error} = await db.from("questions").delete().eq("id",id);
+  if(error) return say("Could not delete category.");
+  await loadAdmin();
+};
+
+async function loadVotes() {
+  const [{data:v,error}, {data:c}, {data:q}] = await Promise.all([
+    db.from("votes").select("voter_id,nominee_id,question_id,created_at").order("created_at",{ascending:false}),
+    db.from("classmates").select("id,name"),
+    db.from("questions").select("id,question")
+  ]);
+  if(error) { $("voteList").textContent = "Could not load votes."; return; }
+  const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
+  const titles = Object.fromEntries((q||[]).map(x => [x.id,x.question]));
+  $("voteList").innerHTML = (v||[]).map(x => `
+    <p><b>${escapeHTML(names[x.voter_id] || "Unknown")}</b>
+    voted for <b>${escapeHTML(names[x.nominee_id] || "Unknown")}</b>
+    in “${escapeHTML(titles[x.question_id] || "Deleted category")}”</p>
+  `).join("") || "No votes yet.";
+}
+
+$("refreshVotes").onclick = loadVotes;
+
+async function start() {
+  await loadPublicData();
+  const {data} = await db.auth.getSession();
+  if(data.session) {
+    currentUser = data.session.user;
+    await showAdmin();
+  }
+}
+start();
+</script>
 </body>
 </html>
