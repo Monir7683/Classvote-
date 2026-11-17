@@ -247,7 +247,23 @@ async function loadVotes() {
 
 $("refreshVotes").onclick = loadVotes;
 
-async function start() {
+async function start() {async function start() {
+  await loadPublicData();
+
+  const {data} = await db.auth.getSession();
+
+  if (window.location.hash.includes("type=recovery") && data.session) {
+    $("resetPassword").classList.remove("hidden");
+    $("login").classList.add("hidden");
+    $("voting").classList.add("hidden");
+    return;
+  }
+
+  if(data.session) {
+    currentUser = data.session.user;
+    await showAdmin();
+  }
+}
   await loadPublicData();
   const {data} = await db.auth.getSession();
   if(data.session) {
