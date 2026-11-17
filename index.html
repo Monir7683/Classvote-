@@ -255,6 +255,34 @@ async function start() {
     await showAdmin();
   }
 }
+  db.auth.onAuthStateChange((event, session) => {
+  if (event === "PASSWORD_RECOVERY") {
+    $("resetPassword").classList.remove("hidden");
+    $("login").classList.add("hidden");
+    $("voting").classList.add("hidden");
+  }
+});
+
+$("savePassword").onclick = async () => {
+  const password = $("newPassword").value;
+
+  if (password.length < 8) {
+    return say("Password must be at least 8 characters.");
+  }
+
+  const { data, error } = await db.auth.updateUser({
+    password: password
+  });
+
+  if (error) return say("Error: " + error.message);
+
+  await db.auth.signOut();
+  $("resetPassword").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("voting").classList.remove("hidden");
+  $("newPassword").value = "";
+  say("Password updated successfully! 🎉");
+};
 start();
 </script>
 </body>
