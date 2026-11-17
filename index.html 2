@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClassVote 🏆</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#ffe0f0,#dcd5ff);
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #393052;
+}
+header {
+  background: white;
+  padding: 25px;
+  border-radius: 25px;
+  margin-bottom: 20px;
+}
+h1 { color: #8155d9; font-size: 36px; }
+.card {
+  background: white;
+  padding: 20px;
+  margin: 15px auto;
+  max-width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px #0001;
+}
+button {
+  background: #895ce0;
+  color: white;
+  border: 0;
+  border-radius: 15px;
+  padding: 12px 20px;
+  font-size: 16px;
+  margin: 5px;
+}
+input {
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  width: 80%;
+  margin: 8px;
+}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🏆 ClassVote</h1>
+<p>Vote for your class legends!</p>
+</header>
+
+<div class="card">
+<h2>😂 Who is the funniest?</h2>
+<input id="name" placeholder="Enter a classmate's name">
+<br>
+<button onclick="vote()">Vote!</button>
+<p id="message"></p>
+</div>
+
+<div class="card">
+<h2>🌟 More awards coming soon!</h2>
+<p>Best at sports ⚽</p>
+<p>Biggest gamer 🎮</p>
+<p>Best style 😎</p>
+</div>
+
+<script>
+function vote() {
+ const name = document.getElementById("name").value.trim();
+ if (!name) {
+  document.getElementById("message").textContent =
+   "Please enter a name!";
+  return;
+ }
+ document.getElementById("message").textContent =
+   "Thanks for voting! 🎉";
+}
+</script>
+
+</body>
+</html>
