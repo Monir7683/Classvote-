@@ -103,7 +103,7 @@ function escapeHTML(value) {
 }
 
 async function loadPublicData() {
-  say("Connecting to database...");
+const test = await db.from("classmates").select("name"); alert(JSON.stringify(test));
   const [c,q] = await Promise.all([
     db.from("classmates").select("id,name").order("name"),
     db.from("questions").select("id,question,active").eq("active",true)
