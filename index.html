@@ -237,7 +237,23 @@ window.removeQuestion = async id => {
 };
 
 async function loadVotes() {
-  const [{data:v,error}, {data:c}, {data:q}] = await Promise.all([
+ async function loadVotes() {
+  $("voteList").textContent = "Testing database...";
+
+  try {
+    const result = await db.from("votes").select("voter_id,nominee_id,question_id");
+
+    if(result.error) {
+      $("voteList").textContent = "Votes error: " + result.error.message;
+      return;
+    }
+
+    $("voteList").textContent = "Votes loaded: " + result.data.length;
+  } catch(error) {
+    $("voteList").textContent = "Error: " + error.message;
+  }
+}
+
     db.from("votes").select("voter_id,nominee_id,question_id,created_at"),
     db.from("classmates").select("id,name"),
     db.from("questions").select("id,question")
