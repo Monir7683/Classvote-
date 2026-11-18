@@ -269,13 +269,6 @@ async function start() {
     await showAdmin();
   }
 }
-  await loadPublicData();
-  const {data} = await db.auth.getSession();
-  if(data.session) {
-    currentUser = data.session.user;
-    await showAdmin();
-  }
-}
   db.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") {
     $("resetPassword").classList.remove("hidden");
