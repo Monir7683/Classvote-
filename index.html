@@ -292,59 +292,6 @@ async function loadVotes() {
 
   $("refreshVotes").onclick = loadVotes;
 
-    db.from("votes").select("voter_id,nominee_id,question_id,created_at"),
-    db.from("classmates").select("id,name"),
-    db.from("questions").select("id,question")
-  ]);
-
-  if(error) {
-    $("voteList").textContent = "Error: " + error.message;
-    return;
-  }
-
-  const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
-
-  const votes = v || [];
-  const questions = q || [];
-
-  $("voteList").innerHTML = questions.map(question => {
-    const categoryVotes = votes.filter(
-      vote => vote.question_id === question.id
-    );
-
-    const total = categoryVotes.length;
-
-    const counts = {};
-    categoryVotes.forEach(vote => {
-      counts[vote.nominee_id] = (counts[vote.nominee_id] || 0) + 1;
-    });
-
-    const results = Object.entries(counts)
-      .sort((a,b) => b[1] - a[1])
-      .map(([id,count]) => {
-        const percent = Math.round(count / total * 100);
-
-        return `
-          <div style="margin:12px 0">
-            <b>${escapeHTML(names[id] || "Unknown")}</b>
-            — ${count} votes (${percent}%)
-            <div style="background:#ddd;border-radius:10px;height:12px;overflow:hidden">
-              <div style="width:${percent}%;background:#8055d9;height:12px"></div>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-    return `
-      <div style="margin-top:20px">
-        <h3>${escapeHTML(question.question)}</h3>
-        <p>Total votes: ${total}</p>
-        ${results || "No votes yet."}
-      </div>
-    `;
-  }).join("") || "No categories found.";
-}
-
 
 async function start() {
   await loadPublicData();
