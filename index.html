@@ -237,22 +237,60 @@ window.removeQuestion = async id => {
 };
 
 async function loadVotes() {
- async function loadVotes() {
-  $("voteList").textContent = "Testing database...";
+  $("voteList").textContent = "Loading results...";
 
   try {
-    const result = await db.from("votes").select("voter_id,nominee_id,question_id");
+    const [{data:v,error}, {data:c}, {data:q}] = await Promise.all([
+      db.from("votes").select("voter_id,nominee_id,question_id"),
+      db.from("classmates").select("id,name"),
+      db.from("questions").select("id,question")
+    ]);
 
-    if(result.error) {
-      $("voteList").textContent = "Votes error: " + result.error.message;
+    if(error) {
+      $("voteList").textContent = "Error: " + error.message;
       return;
     }
 
-    $("voteList").textContent = "Votes loaded: " + result.data.length;
+    const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
+
+    $("voteList").innerHTML = (q||[]).map(question => {
+      const categoryVotes = (v||[]).filter(
+        vote => vote.question_id === question.id
+      );
+
+      const total = categoryVotes.length;
+      const counts = {};
+
+      categoryVotes.forEach(vote => {
+        counts[vote.nominee_id] = (counts[vote.nominee_id] || 0) + 1;
+      });
+
+      const results = Object.entries(counts)
+        .sort((a,b) => b[1] - a[1])
+        .map(([id,count]) => {
+          const percent = Math.round(count / total * 100);
+
+          return `
+            <p>${escapeHTML(names[id] || "Unknown")} — ${count} votes (${percent}%)</p>
+            <div style="background:#ddd;border-radius:10px;height:12px;overflow:hidden">
+              <div style="width:${percent}%;background:#8055d9;height:12px"></div>
+            </div>
+          `;
+        }).join("");
+
+      return `
+        <h3>${escapeHTML(question.question)}</h3>
+        <p>Total votes: ${total}</p>
+        ${results || "No votes yet."}
+      `;
+    }).join("") || "No categories found.";
+
   } catch(error) {
     $("voteList").textContent = "Error: " + error.message;
   }
 }
+
+  $("refreshVotes").onclick = loadVotes;
 
     db.from("votes").select("voter_id,nominee_id,question_id,created_at"),
     db.from("classmates").select("id,name"),
