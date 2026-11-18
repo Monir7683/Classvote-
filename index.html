@@ -290,8 +290,11 @@ async function loadVotes() {
   }
 }
 
-  $("refreshVotes").onclick = loadVotes;
-
+$("refreshVotes").onclick = async () => {
+  $("refreshVotes").disabled = true;
+  await loadVotes();
+  $("refreshVotes").disabled = false;
+};
 
 async function start() {
   await loadPublicData();
