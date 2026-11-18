@@ -137,7 +137,7 @@ $("submitVote").onclick = async () => {
   if(choices.some(x => !x.value)) return say("Please answer every category.");
   $("submitVote").disabled = true;
   for(const choice of choices) {
-    const {error} = await db.rpc("submit_vote", {
+    const {error} = await db.rpc("submit_vote_with_code", {
       p_code:code,
       p_nominee_id:choice.value,
       p_question_id:choice.dataset.question
