@@ -107,7 +107,11 @@ async function loadPublicData() {
     db.from("classmates").select("id,name").order("name"),
     db.from("questions").select("id,question,active").eq("active",true)
   ]);
-  if(c.error || q.error) { say("Could not load the voting page."); return; }
+  if (c.error || q.error) {
+  say("Classmates: " + (c.error?.message || "OK") +
+      " | Questions: " + (q.error?.message || "OK"));
+  return;
+}
   classmates = c.data || [];
   questions = q.data || [];
   $("voter").innerHTML = '<option value="">Choose your name</option>' +
