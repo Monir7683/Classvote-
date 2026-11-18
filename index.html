@@ -307,11 +307,12 @@ async function loadVotes() {
 
 $("refreshVotes").onclick = async () => {
   $("refreshVotes").disabled = true;
-  try {
-    await loadVotes();
-  } finally {
-    $("refreshVotes").disabled = false;
-  }
+  $("refreshVotes").textContent = "Refreshing...";
+
+  await loadVotes();
+
+  $("refreshVotes").textContent = "Refresh votes";
+  $("refreshVotes").disabled = false;
 };
 
 
