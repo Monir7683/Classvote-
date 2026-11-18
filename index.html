@@ -255,7 +255,10 @@ async function loadVotes() {
   `).join("") || "No votes yet.";
 }
 
-$("refreshVotes").onclick = loadVotes;
+$("refreshVotes").onclick = () => {
+  $("voteList").textContent = "Refreshing...";
+  loadVotes();
+};
 
 async function start() {
   await loadPublicData();
