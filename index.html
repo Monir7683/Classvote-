@@ -241,7 +241,7 @@ async function loadVotes() {
 
   try {
     const [{data:v,error}, {data:c}, {data:q}] = await Promise.all([
-      db.from("votes").select("voter_id,nominee_id,question_id"),
+      db.from("votes").select("voter_id,nominee_id,question_id,created_at").order("created_at",{ascending:false}),
       db.from("classmates").select("id,name"),
       db.from("questions").select("id,question")
     ]);
@@ -271,17 +271,32 @@ async function loadVotes() {
           const percent = Math.round(count / total * 100);
 
           return `
-            <p>${escapeHTML(names[id] || "Unknown")} — ${count} votes (${percent}%)</p>
+            <p><b>${escapeHTML(names[id] || "Unknown")}</b>
+            — ${count} votes (${percent}%)</p>
             <div style="background:#ddd;border-radius:10px;height:12px;overflow:hidden">
               <div style="width:${percent}%;background:#8055d9;height:12px"></div>
             </div>
           `;
         }).join("");
 
+      const individualVotes = categoryVotes.map(vote => `
+        <p>
+          <b>${escapeHTML(names[vote.voter_id] || "Unknown")}</b>
+          voted for
+          <b>${escapeHTML(names[vote.nominee_id] || "Unknown")}</b>
+        </p>
+      `).join("");
+
       return `
-        <h3>${escapeHTML(question.question)}</h3>
-        <p>Total votes: ${total}</p>
-        ${results || "No votes yet."}
+        <div style="margin-top:20px">
+          <h3>${escapeHTML(question.question)}</h3>
+          <p>Total votes: ${total}</p>
+          ${results || "No votes yet."}
+          <details style="margin-top:12px">
+            <summary>See who voted for whom</summary>
+            ${individualVotes || "No votes yet."}
+          </details>
+        </div>
       `;
     }).join("") || "No categories found.";
 
@@ -292,9 +307,13 @@ async function loadVotes() {
 
 $("refreshVotes").onclick = async () => {
   $("refreshVotes").disabled = true;
-  await loadVotes();
-  $("refreshVotes").disabled = false;
+  try {
+    await loadVotes();
+  } finally {
+    $("refreshVotes").disabled = false;
+  }
 };
+
 
 async function start() {
   await loadPublicData();
