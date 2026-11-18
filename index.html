@@ -242,7 +242,10 @@ async function loadVotes() {
     db.from("classmates").select("id,name"),
     db.from("questions").select("id,question")
   ]);
-  if(error) { $("voteList").textContent = "Could not load votes."; return; }
+ if(error) {
+  $("voteList").textContent = "Error: " + error.message;
+  return;
+}
   const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
   const titles = Object.fromEntries((q||[]).map(x => [x.id,x.question]));
   $("voteList").innerHTML = (v||[]).map(x => `
