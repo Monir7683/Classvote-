@@ -252,7 +252,7 @@ async function loadVotes() {
 
 $("refreshVotes").onclick = loadVotes;
 
-async function start() {async function start() {
+async function start() {
   await loadPublicData();
 
   const {data} = await db.auth.getSession();
