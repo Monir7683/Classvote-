@@ -130,15 +130,15 @@ async function loadPublicData() {
 }
 
 $("submitVote").onclick = async () => {
-  const voter = $("voter").value;
+ const code = $("voter").value.trim();
   const choices = [...document.querySelectorAll(".nominee")];
-  if(!voter) return say("Please choose your name first.");
+ if(!code) return say("Please enter your voting code.");
   if(!choices.length) return say("There are no active categories yet.");
   if(choices.some(x => !x.value)) return say("Please answer every category.");
   $("submitVote").disabled = true;
   for(const choice of choices) {
     const {error} = await db.rpc("submit_vote", {
-      p_voter_id:voter,
+      p_code:code,
       p_nominee_id:choice.value,
       p_question_id:choice.dataset.question
     });
