@@ -286,7 +286,69 @@ async function loadVotes() {
 
     const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
 
-    $("voteList").innerHTML = (q||[]).map(question => {
+    // OVERALL LEADERBOARD
+    const totalVotes = (v||[]).length;
+    const overallCounts = {};
+
+    (c||[]).forEach(person => {
+      overallCounts[person.id] = 0;
+    });
+
+    (v||[]).forEach(vote => {
+      overallCounts[vote.nominee_id] =
+        (overallCounts[vote.nominee_id] || 0) + 1;
+    });
+
+    const leaderboard = Object.entries(overallCounts)
+      .sort((a,b) => b[1] - a[1])
+      .map(([id,count],index) => {
+        const percent = totalVotes
+          ? Math.round(count / totalVotes * 100)
+          : 0;
+
+        return `
+          <div style="display:flex;align-items:center;gap:15px;margin:18px 0;padding:12px;background:#f3efff;border-radius:12px;color:#292342">
+            <div style="
+              width:76px;
+              height:76px;
+              flex-shrink:0;
+              border-radius:50%;
+              background:conic-gradient(#8055d9 ${percent}%,#ddd 0);
+              display:flex;
+              align-items:center;
+              justify-content:center;
+            ">
+              <div style="
+                width:58px;
+                height:58px;
+                border-radius:50%;
+                background:white;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-weight:bold;
+              ">${percent}%</div>
+            </div>
+
+            <div>
+              <b>${index + 1}. ${escapeHTML(names[id] || "Unknown")}</b>
+              <p style="margin:5px 0">${count} votes received</p>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+    const overallHTML = `
+      <div style="margin-bottom:25px">
+        <h2>🏆 Overall leaderboard</h2>
+        <p>Total votes across all categories: ${totalVotes}</p>
+        ${leaderboard || "No classmates found."}
+      </div>
+      <hr>
+      <h2>📊 Category results</h2>
+    `;
+
+    const categoryHTML = (q||[]).map(question => {
       const categoryVotes = (v||[]).filter(
         vote => vote.question_id === question.id
       );
@@ -333,10 +395,13 @@ async function loadVotes() {
       `;
     }).join("") || "No categories found.";
 
+    $("voteList").innerHTML = overallHTML + categoryHTML;
+
   } catch(error) {
     $("voteList").textContent = "Error: " + error.message;
   }
 }
+
 
 $("refreshVotes").onclick = async () => {
   $("refreshVotes").disabled = true;
