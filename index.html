@@ -6,21 +6,88 @@
 <title>ClassVote 🏆</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#d9c8ff,#ffd6e7,#c9f3ff);color:#292342;min-height:100vh;padding:20px}
-main{max-width:750px;margin:25px auto;background:white;padding:25px;border-radius:24px;box-shadow:0 8px 30px #55447722}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#0b0814,#17102b,#21133b);
+  color:#f5f0ff;
+  min-height:100vh;
+  padding:20px;
+}
+
+main{
+  max-width:750px;
+  margin:25px auto;
+  background:#171326;
+  padding:25px;
+  border-radius:24px;
+  border:1px solid #35294d;
+  box-shadow:0 8px 35px #00000055;
+}
 h1{text-align:center;font-size:38px;margin-bottom:5px}
-.subtitle{text-align:center;color:#716b83;margin-bottom:25px}
-.card{background:#f7f4ff;border-radius:16px;padding:18px;margin:14px 0}
-input,select,button{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin:7px 0;font-size:16px}
-button{background:#7554d9;color:white;border:0;font-weight:bold;cursor:pointer}
+.subtitle{
+  text-align:center;
+  color:#b9a9d9;
+  margin-bottom:25px;
+  font-size:16px;
+  line-height:1.6;
+}
+.card{
+  background:#211a35;
+  border:1px solid #382b50;
+  border-radius:16px;
+  padding:20px;
+  margin:14px 0;
+  box-shadow:0 5px 20px #00000022;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #493963;
+  background:#120e20;
+  color:#ffffff;
+  margin:7px 0;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+}
+button{
+  background:linear-gradient(135deg,#8055d9,#6236b5);
+  color:white;
+  border:0;
+  font-weight:bold;
+  cursor:pointer;
+  border-radius:12px;
+  padding:13px 18px;
+  transition:0.2s;
+  box-shadow:0 4px 15px #8055d933;
+}
+
 button:hover{opacity:.85}
-.secondary{background:#ded7f7;color:#33265b}
+.secondary{
+  background:#382b50;
+  color:#e8dcff;
+  border:1px solid #594477;
+}
 .danger{background:#d95770}
 .hidden{display:none}
 .row{display:flex;gap:8px;align-items:center}
 .row button{width:auto}
-.vote-card{background:#fff;border:1px solid #eee;border-radius:14px;padding:15px;margin:12px 0}
-small{color:#716b83}
+.vote-card{
+  background:#211a35;
+  border:1px solid #493963;
+  border-radius:14px;
+  padding:18px;
+  margin:12px 0;
+  color:#f5f0ff;
+  box-shadow:0 4px 15px #00000022;
+}
+small{
+  color:#b9a9d9;
+}
 #message{font-weight:bold;text-align:center;margin:12px}
 </style>
 </head>
