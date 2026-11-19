@@ -40,10 +40,27 @@ small{color:#716b83}
     <p id="codeMessage"></p>
   </div>
 
-  <div id="votingContent" class="hidden">
-    <div id="questions"></div>
-    <button id="submitVote">Submit my votes 🎉</button>
+<div id="votingContent" class="hidden">
+  <div id="questionProgress"></div>
+
+  <div id="questions"></div>
+
+  <div style="display:flex;gap:10px;margin-top:20px">
+    <button id="prevQuestion" class="secondary" disabled>
+      ← Back
+    </button>
+
+    <button id="nextQuestion">
+      Next →
+    </button>
   </div>
+
+  <button id="submitVote" class="hidden">
+    Submit my votes 🎉
+  </button>
+</div>
+
+
 </section>
 <hr>
 
@@ -97,7 +114,9 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let classmates = [];
 let questions = [];
 let currentUser = null;
-
+let currentQuestionIndex = 0;
+let voteAnswers = {};
+  
 const $ = id => document.getElementById(id);
 const say = message => $("message").textContent = message;
 
@@ -112,24 +131,100 @@ async function loadPublicData() {
     db.from("classmates").select("id,name").order("name"),
     db.from("questions").select("id,question,active").eq("active",true)
   ]);
+
   if (c.error || q.error) {
-  say("Classmates: " + (c.error?.message || "OK") +
-      " | Questions: " + (q.error?.message || "OK"));
-  return;
-}
+    say("Classmates: " + (c.error?.message || "OK") +
+        " | Questions: " + (q.error?.message || "OK"));
+    return;
+  }
+
   classmates = c.data || [];
   questions = q.data || [];
-  $("voter").innerHTML = '<option value="">Choose your name</option>' +
-    classmates.map(x => `<option value="${x.id}">${escapeHTML(x.name)}</option>`).join("");
-  $("questions").innerHTML = questions.map(q => `
+
+  currentQuestionIndex = 0;
+  voteAnswers = {};
+
+  renderQuestion();
+}
+function renderQuestion() {
+  if (!questions.length) {
+    $("questions").textContent = "No active questions.";
+    $("questionProgress").textContent = "";
+    $("prevQuestion").disabled = true;
+    $("nextQuestion").classList.add("hidden");
+    $("submitVote").classList.add("hidden");
+    return;
+  }
+
+  const q = questions[currentQuestionIndex];
+
+  $("questionProgress").innerHTML = `
+    <p>Question ${currentQuestionIndex + 1} of ${questions.length}</p>
+    <div style="background:#ddd;height:8px;border-radius:8px;overflow:hidden">
+      <div style="background:#8055d9;height:8px;width:${((currentQuestionIndex + 1) / questions.length) * 100}%"></div>
+    </div>
+  `;
+
+  $("questions").innerHTML = `
     <div class="vote-card">
       <h3>${escapeHTML(q.question)}</h3>
-      <select class="nominee" data-question="${q.id}">
+      <select id="currentNominee">
         <option value="">Choose someone</option>
-        ${classmates.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("")}
+        ${classmates.map(person => `
+          <option value="${person.id}" ${voteAnswers[q.id] === person.id ? "selected" : ""}>
+            ${escapeHTML(person.name)}
+          </option>
+        `).join("")}
       </select>
-    </div>`).join("");
+    </div>
+  `;
+
+  $("currentNominee").onchange = () => {
+    voteAnswers[q.id] = $("currentNominee").value;
+  };
+
+  $("prevQuestion").disabled = currentQuestionIndex === 0;
+
+  if (currentQuestionIndex === questions.length - 1) {
+    $("nextQuestion").classList.add("hidden");
+    $("submitVote").classList.remove("hidden");
+  } else {
+    $("nextQuestion").classList.remove("hidden");
+    $("submitVote").classList.add("hidden");
+  }
 }
+
+$("nextQuestion").onclick = () => {
+  const q = questions[currentQuestionIndex];
+  const select = $("currentNominee");
+
+  if (!select.value) {
+    say("Please choose someone before continuing.");
+    return;
+  }
+
+  voteAnswers[q.id] = select.value;
+
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    renderQuestion();
+  }
+};
+
+$("prevQuestion").onclick = () => {
+  const q = questions[currentQuestionIndex];
+  const select = $("currentNominee");
+
+  if (select) {
+    voteAnswers[q.id] = select.value;
+  }
+
+  if (currentQuestionIndex > 0) {
+    currentQuestionIndex--;
+    renderQuestion();
+  }
+};
+
 
   $("unlockVoting").onclick = async () => {
   const code = $("voter").value.trim();
@@ -161,31 +256,40 @@ async function loadPublicData() {
 
 
 $("submitVote").onclick = async () => {
- const code = $("voter").value.trim();
-  const choices = [...document.querySelectorAll(".nominee")];
- if(!code) return say("Please enter your voting code.");
-  if(!choices.length) return say("There are no active categories yet.");
-  if(choices.some(x => !x.value)) return say("Please answer every category.");
+  const code = $("voter").value.trim();
+
+  if (!code) return say("Please enter your voting code.");
+  if (!questions.length) return say("There are no active categories yet.");
+
+  const missing = questions.some(q => !voteAnswers[q.id]);
+
+  if (missing) {
+    say("Please answer every category.");
+    return;
+  }
+
   $("submitVote").disabled = true;
-  for(const choice of choices) {
+
+  for (const question of questions) {
     const {error} = await db.rpc("submit_vote_with_code", {
-      p_code:code,
-      p_nominee_id:choice.value,
-      p_question_id:choice.dataset.question
+      p_code: code,
+      p_nominee_id: voteAnswers[question.id],
+      p_question_id: question.id
     });
-    if(error) {
-      say(error.code === "23505"
-        ? "You have already voted in one of these categories."
-        : "Could not submit votes: " + error.message);
+
+    if (error) {
+      say("Could not submit votes: " + error.message);
       $("submitVote").disabled = false;
       return;
     }
   }
-say("Your votes have been saved! You can still change them 🎉");
-$("submitVote").textContent = "Save changed votes";
-$("submitVote").disabled = false;
 
+  say("Your votes have been saved! You can still change them 🎉");
+  $("submitVote").textContent = "Save changed votes";
+  $("submitVote").disabled = false;
 };
+
+
 
 $("loginButton").onclick = async () => {
   const {data,error} = await db.auth.signInWithPassword({
