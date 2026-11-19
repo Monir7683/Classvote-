@@ -45,7 +45,7 @@ small{color:#716b83}
 
 <hr>
 
-<section id="login">
+<section id="login" class="hidden">
   <h2>🔐 Admin login</h2>
   <input id="email" type="email" placeholder="Admin email">
   <input id="password" type="password" placeholder="Admin password">
@@ -328,11 +328,16 @@ async function start() {
     return;
   }
 
+  if (window.location.search.includes("admin")) {
+    $("login").classList.remove("hidden");
+  }
+
   if(data.session) {
     currentUser = data.session.user;
     await showAdmin();
   }
 }
+
   db.auth.onAuthStateChange((event, session) => {
   if (event === "PASSWORD_RECOVERY") {
     $("resetPassword").classList.remove("hidden");
