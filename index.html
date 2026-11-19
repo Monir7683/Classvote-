@@ -34,15 +34,17 @@ small{color:#716b83}
 <section id="voting">
   <div class="card">
     <h2>🗳️ Cast your votes</h2>
-    <p>Choose your name and vote for someone in each category.</p>
-    <small>Names are selected by users and are not independently verified.</small>
-    <label>Your name</label>
-  <input id="voter" type="text" placeholder="Enter your private voting code">
+    <p>Enter your private voting code to unlock the questions.</p>
+    <input id="voter" type="text" placeholder="Enter your private voting code">
+    <button id="unlockVoting">Continue</button>
+    <p id="codeMessage"></p>
   </div>
-  <div id="questions"></div>
-  <button id="submitVote">Submit my votes 🎉</button>
-</section>
 
+  <div id="votingContent" class="hidden">
+    <div id="questions"></div>
+    <button id="submitVote">Submit my votes 🎉</button>
+  </div>
+</section>
 <hr>
 
 <section id="login" class="hidden">
@@ -128,6 +130,35 @@ async function loadPublicData() {
       </select>
     </div>`).join("");
 }
+
+  $("unlockVoting").onclick = async () => {
+  const code = $("voter").value.trim();
+
+  if (!code) {
+    $("codeMessage").textContent = "Please enter your code.";
+    return;
+  }
+
+  $("unlockVoting").disabled = true;
+  $("codeMessage").textContent = "Checking code...";
+
+  const {data, error} = await db.rpc("check_voting_code", {
+    p_code: code
+  });
+
+  $("unlockVoting").disabled = false;
+
+  if (error || !data) {
+    $("codeMessage").textContent = "Invalid code. Try again.";
+    return;
+  }
+
+  $("codeMessage").textContent = "Code accepted!";
+  $("votingContent").classList.remove("hidden");
+  $("voter").disabled = true;
+  $("unlockVoting").classList.add("hidden");
+};
+
 
 $("submitVote").onclick = async () => {
  const code = $("voter").value.trim();
