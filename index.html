@@ -181,8 +181,10 @@ $("submitVote").onclick = async () => {
       return;
     }
   }
-  say("Thank you! Your votes have been submitted 🎉");
-  $("voting").classList.add("hidden");
+say("Your votes have been saved! You can still change them 🎉");
+$("submitVote").textContent = "Save changed votes";
+$("submitVote").disabled = false;
+
 };
 
 $("loginButton").onclick = async () => {
