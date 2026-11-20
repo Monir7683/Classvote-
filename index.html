@@ -89,9 +89,39 @@ small{
   color:#b9a9d9;
 }
 #message{font-weight:bold;text-align:center;margin:12px}
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.popup-content {
+  background: #211a35;
+  border: 1px solid #8055d9;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  max-width: 400px;
+  color: white;
+  box-shadow: 0 0 30px rgba(128,85,217,0.3);
+}
 </style>
 </head>
 <body>
+  <div id="welcomePopup" class="popup">
+  <div class="popup-content">
+    <h2>👋 Welcome to ClassVote!</h2>
+    <p>Your answers are private. No one can see who you voted for.</p>
+    <button onclick="document.getElementById('welcomePopup').style.display='none'">
+      Continue
+    </button>
+  </div>
+</div>
 <main>
 <h1>🏆 ClassVote</h1>
 <p class="subtitle">Vote for your class legends!</p>
