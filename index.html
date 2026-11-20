@@ -697,7 +697,7 @@ $("savePassword").onclick = async () => {
   say("Password updated successfully! 🎉");
 };
 start();
-if (!localStorage.getItem("welcomeSeen")) {
+if (true) {
   document.getElementById("welcomePopup").style.display = "flex";
   localStorage.setItem("welcomeSeen", "yes");
 }
