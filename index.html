@@ -108,8 +108,39 @@ small{
   text-align: center;
   max-width: 400px;
   color: white;
-  box-shadow: 0 0 30px rgba(128,85,217,0.3);
+ box-shadow:
+  0 0 20px rgba(128,85,217,0.5),
+  0 0 50px rgba(128,85,217,0.3),
+  0 0 90px rgba(128,85,217,0.15);
 }
+  .popup {
+  animation: fadeIn 0.6s ease;
+}
+
+.popup-content {
+  animation: popIn 0.7s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 </style>
 </head>
 <body>
