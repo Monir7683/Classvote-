@@ -113,7 +113,7 @@ small{
 </style>
 </head>
 <body>
-  <div id="welcomePopup" class="popup">
+<div id="welcomePopup" class="popup" style="display:none;">
   <div class="popup-content">
     <h2>👋 Welcome to ClassVote!</h2>
     <p>Your answers are private. No one can see who you voted for.</p>
@@ -666,6 +666,10 @@ $("savePassword").onclick = async () => {
   say("Password updated successfully! 🎉");
 };
 start();
+if (!localStorage.getItem("welcomeSeen")) {
+  document.getElementById("welcomePopup").style.display = "flex";
+  localStorage.setItem("welcomeSeen", "yes");
+}
 </script>
 </body>
 </html>
