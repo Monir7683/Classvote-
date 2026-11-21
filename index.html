@@ -218,10 +218,33 @@ small{
   </div>
 
   <div class="card">
-    <h3>📊 Votes</h3>
-    <button id="refreshVotes" class="secondary">Refresh votes</button>
-    <div id="voteList"></div>
-  </div>
+  <h3>📊 Admin Reports</h3>
+
+  <button id="refreshVotes" class="secondary">
+    Refresh votes
+  </button>
+
+  <details>
+    <summary>✅ Who answered everything</summary>
+    <div id="completionList"></div>
+  </details>
+
+  <details>
+    <summary>🏆 Overall leaderboard</summary>
+    <div id="overallResults"></div>
+  </details>
+
+  <details>
+    <summary>📊 Category results</summary>
+    <div id="categoryResults"></div>
+  </details>
+
+  <details>
+    <summary>👀 Who voted for whom</summary>
+    <div id="individualVotes"></div>
+  </details>
+</div>
+
 </section>
 <section id="resetPassword" class="hidden">
   <h2>🔑 Choose a new password</h2>
@@ -502,31 +525,65 @@ window.removeQuestion = async id => {
 };
 
 async function loadVotes() {
-  $("voteList").textContent = "Loading results...";
+  $("completionList").textContent = "Loading...";
+  $("overallResults").textContent = "Loading...";
+  $("categoryResults").textContent = "Loading...";
+  $("individualVotes").textContent = "Loading...";
 
   try {
-    const [{data:v,error}, {data:c}, {data:q}] = await Promise.all([
-      db.from("votes").select("voter_id,nominee_id,question_id,created_at").order("created_at",{ascending:false}),
-      db.from("classmates").select("id,name"),
-      db.from("questions").select("id,question")
-    ]);
+    const [{data:v,error}, {data:c,error:ce}, {data:q,error:qe}] =
+      await Promise.all([
+        db.from("votes")
+          .select("voter_id,nominee_id,question_id,created_at")
+          .order("created_at",{ascending:false}),
+        db.from("classmates").select("id,name"),
+        db.from("questions").select("id,question,active")
+      ]);
 
-    if(error) {
-      $("voteList").textContent = "Error: " + error.message;
-      return;
+    if(error || ce || qe) {
+      throw new Error(error?.message || ce?.message || qe?.message);
     }
 
-    const names = Object.fromEntries((c||[]).map(x => [x.id,x.name]));
+    const votes = v || [];
+    const people = c || [];
+    const allQuestions = q || [];
+    const activeQuestions = allQuestions.filter(x => x.active);
 
-    // OVERALL LEADERBOARD
-    const totalVotes = (v||[]).length;
+    const names = Object.fromEntries(
+      people.map(x => [x.id,x.name])
+    );
+
+    // 1. WHO ANSWERED EVERYTHING
+    const completed = people.filter(person =>
+      activeQuestions.length > 0 &&
+      activeQuestions.every(question =>
+        votes.some(vote =>
+          vote.voter_id === person.id &&
+          vote.question_id === question.id
+        )
+      )
+    );
+
+    $("completionList").innerHTML = `
+      <p><b>${completed.length}</b> out of
+      <b>${people.length}</b> classmates completed every active category.</p>
+      ${completed.length
+        ? completed.map(person =>
+            `<p>✅ ${escapeHTML(person.name)}</p>`
+          ).join("")
+        : "Nobody has completed every active category yet."
+      }
+    `;
+
+    // 2. OVERALL LEADERBOARD
+    const totalVotes = votes.length;
     const overallCounts = {};
 
-    (c||[]).forEach(person => {
+    people.forEach(person => {
       overallCounts[person.id] = 0;
     });
 
-    (v||[]).forEach(vote => {
+    votes.forEach(vote => {
       overallCounts[vote.nominee_id] =
         (overallCounts[vote.nominee_id] || 0) + 1;
     });
@@ -539,74 +596,66 @@ async function loadVotes() {
           : 0;
 
         return `
-          <div style="display:flex;align-items:center;gap:15px;margin:18px 0;padding:12px;background:#f3efff;border-radius:12px;color:#292342">
-            <div style="
-              width:76px;
-              height:76px;
-              flex-shrink:0;
-              border-radius:50%;
-              background:conic-gradient(#8055d9 ${percent}%,#ddd 0);
-              display:flex;
-              align-items:center;
-              justify-content:center;
-            ">
-              <div style="
-                width:58px;
-                height:58px;
-                border-radius:50%;
-                background:white;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-weight:bold;
-              ">${percent}%</div>
-            </div>
-
-            <div>
-              <b>${index + 1}. ${escapeHTML(names[id] || "Unknown")}</b>
-              <p style="margin:5px 0">${count} votes received</p>
+          <div style="margin:15px 0;padding:12px;background:#211a35;border-radius:12px">
+            <b>${index + 1}. ${escapeHTML(names[id] || "Unknown")}</b>
+            <p>${count} votes (${percent}%)</p>
+            <div style="background:#493963;border-radius:10px;height:10px;overflow:hidden">
+              <div style="width:${percent}%;background:#8055d9;height:10px"></div>
             </div>
           </div>
         `;
       }).join("");
 
-    const overallHTML = `
-      <div style="margin-bottom:25px">
-        <h2>🏆 Overall leaderboard</h2>
-        <p>Total votes across all categories: ${totalVotes}</p>
-        ${leaderboard || "No classmates found."}
-      </div>
-      <hr>
-      <h2>📊 Category results</h2>
+    $("overallResults").innerHTML = `
+      <p>Total votes: ${totalVotes}</p>
+      ${leaderboard || "No votes yet."}
     `;
 
-    const categoryHTML = (q||[]).map(question => {
-      const categoryVotes = (v||[]).filter(
+    // 3. CATEGORY RESULTS
+    $("categoryResults").innerHTML = allQuestions.map(question => {
+      const categoryVotes = votes.filter(
         vote => vote.question_id === question.id
       );
 
-      const total = categoryVotes.length;
       const counts = {};
 
       categoryVotes.forEach(vote => {
-        counts[vote.nominee_id] = (counts[vote.nominee_id] || 0) + 1;
+        counts[vote.nominee_id] =
+          (counts[vote.nominee_id] || 0) + 1;
       });
 
       const results = Object.entries(counts)
         .sort((a,b) => b[1] - a[1])
         .map(([id,count]) => {
-          const percent = Math.round(count / total * 100);
+          const percent = Math.round(
+            count / categoryVotes.length * 100
+          );
 
           return `
             <p><b>${escapeHTML(names[id] || "Unknown")}</b>
             — ${count} votes (${percent}%)</p>
-            <div style="background:#ddd;border-radius:10px;height:12px;overflow:hidden">
-              <div style="width:${percent}%;background:#8055d9;height:12px"></div>
+            <div style="background:#493963;border-radius:10px;height:10px;overflow:hidden">
+              <div style="width:${percent}%;background:#8055d9;height:10px"></div>
             </div>
           `;
         }).join("");
 
-      const individualVotes = categoryVotes.map(vote => `
+      return `
+        <div style="margin:15px 0">
+          <h4>${escapeHTML(question.question)}</h4>
+          <p>Total votes: ${categoryVotes.length}</p>
+          ${results || "No votes yet."}
+        </div>
+      `;
+    }).join("") || "No categories found.";
+
+    // 4. WHO VOTED FOR WHOM
+    $("individualVotes").innerHTML = allQuestions.map(question => {
+      const categoryVotes = votes.filter(
+        vote => vote.question_id === question.id
+      );
+
+      const individualList = categoryVotes.map(vote => `
         <p>
           <b>${escapeHTML(names[vote.voter_id] || "Unknown")}</b>
           voted for
@@ -615,24 +664,24 @@ async function loadVotes() {
       `).join("");
 
       return `
-        <div style="margin-top:20px">
-          <h3>${escapeHTML(question.question)}</h3>
-          <p>Total votes: ${total}</p>
-          ${results || "No votes yet."}
-          <details style="margin-top:12px">
-            <summary>See who voted for whom</summary>
-            ${individualVotes || "No votes yet."}
-          </details>
-        </div>
+        <details style="margin:12px 0">
+          <summary>${escapeHTML(question.question)}</summary>
+          <p>Total votes: ${categoryVotes.length}</p>
+          ${individualList || "No votes yet."}
+        </details>
       `;
     }).join("") || "No categories found.";
 
-    $("voteList").innerHTML = overallHTML + categoryHTML;
-
   } catch(error) {
-    $("voteList").textContent = "Error: " + error.message;
+    const message = "Error: " + error.message;
+
+    $("completionList").textContent = message;
+    $("overallResults").textContent = message;
+    $("categoryResults").textContent = message;
+    $("individualVotes").textContent = message;
   }
 }
+
 
 
 $("refreshVotes").onclick = async () => {
