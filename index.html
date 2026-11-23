@@ -520,7 +520,7 @@ window.toggleQuestion = async (id,active) => {
 window.removeQuestion = async id => {
   if(!confirm("Delete this category?")) return;
   const {error} = await db.from("questions").delete().eq("id",id);
-  if(error) return say("Could not delete category.");
+ if(error) return say("Could not delete category: " + error.message);
   await loadAdmin();
 };
 
