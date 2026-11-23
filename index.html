@@ -7,156 +7,76 @@
 <style>
 *{box-sizing:border-box}
 body{
-  margin:0;
-  font-family:Arial,sans-serif;
+  margin:0;font-family:Arial,sans-serif;
   background:linear-gradient(135deg,#0b0814,#17102b,#21133b);
-  color:#f5f0ff;
-  min-height:100vh;
-  padding:20px;
+  color:#f5f0ff;min-height:100vh;padding:20px;
 }
-
 main{
-  max-width:750px;
-  margin:25px auto;
-  background:#171326;
-  padding:25px;
-  border-radius:24px;
-  border:1px solid #35294d;
+  max-width:750px;margin:25px auto;background:#171326;
+  padding:25px;border-radius:24px;border:1px solid #35294d;
   box-shadow:0 8px 35px #00000055;
 }
 h1{text-align:center;font-size:38px;margin-bottom:5px}
-.subtitle{
-  text-align:center;
-  color:#b9a9d9;
-  margin-bottom:25px;
-  font-size:16px;
-  line-height:1.6;
-}
+.subtitle{text-align:center;color:#b9a9d9;margin-bottom:25px;font-size:16px;line-height:1.6}
 .card{
-  background:#211a35;
-  border:1px solid #382b50;
-  border-radius:16px;
-  padding:20px;
-  margin:14px 0;
-  box-shadow:0 5px 20px #00000022;
+  background:#211a35;border:1px solid #382b50;border-radius:16px;
+  padding:20px;margin:14px 0;box-shadow:0 5px 20px #00000022;
 }
-input,select{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #493963;
-  background:#120e20;
-  color:#ffffff;
-  margin:7px 0;
-  font-size:16px;
+input,select,textarea{
+  width:100%;padding:12px;border-radius:10px;
+  border:1px solid #493963;background:#120e20;color:#fff;
+  margin:7px 0;font-size:16px;
 }
-
-button{
-  width:100%;
+textarea{min-height:100px;resize:vertical}
+button{width:100%;background:linear-gradient(135deg,#8055d9,#6236b5);
+  color:white;border:0;font-weight:bold;cursor:pointer;border-radius:12px;
+  padding:13px 18px;transition:.2s;box-shadow:0 4px 15px #8055d933;
 }
-button{
-  background:linear-gradient(135deg,#8055d9,#6236b5);
-  color:white;
-  border:0;
-  font-weight:bold;
-  cursor:pointer;
-  border-radius:12px;
-  padding:13px 18px;
-  transition:0.2s;
-  box-shadow:0 4px 15px #8055d933;
-}
-
 button:hover{opacity:.85}
-.secondary{
-  background:#382b50;
-  color:#e8dcff;
-  border:1px solid #594477;
-}
+button:disabled{opacity:.5;cursor:not-allowed}
+.secondary{background:#382b50;color:#e8dcff;border:1px solid #594477}
 .danger{background:#d95770}
-.hidden{display:none}
-.row{display:flex;gap:8px;align-items:center}
+.hidden{display:none!important}
+.row{display:flex;gap:8px;align-items:center;margin:10px 0;flex-wrap:wrap}
 .row button{width:auto}
+.row span{flex:1;min-width:120px}
 .vote-card{
-  background:#211a35;
-  border:1px solid #493963;
-  border-radius:14px;
-  padding:18px;
-  margin:12px 0;
-  color:#f5f0ff;
-  box-shadow:0 4px 15px #00000022;
+  background:#211a35;border:1px solid #493963;border-radius:14px;
+  padding:18px;margin:12px 0;color:#f5f0ff;box-shadow:0 4px 15px #00000022;
 }
-small{
-  color:#b9a9d9;
-}
+small{color:#b9a9d9}
 #message{font-weight:bold;text-align:center;margin:12px}
-.popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
+.popup{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;padding:20px;animation:fadeIn .6s ease;
 }
-
-.popup-content {
-  background: #211a35;
-  border: 1px solid #8055d9;
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-  max-width: 400px;
-  color: white;
- box-shadow:
-  0 0 20px rgba(128,85,217,0.5),
-  0 0 50px rgba(128,85,217,0.3),
-  0 0 90px rgba(128,85,217,0.15);
+.popup-content{
+  background:#211a35;border:1px solid #8055d9;border-radius:20px;
+  padding:30px;text-align:center;max-width:400px;color:white;
+  box-shadow:0 0 20px #8055d980,0 0 50px #8055d94d,0 0 90px #8055d926;
+  animation:popIn .7s ease;
 }
-  .popup {
-  animation: fadeIn 0.6s ease;
-}
-
-.popup-content {
-  animation: popIn 0.7s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+hr{border-color:#493963;margin:25px 0}
+details{margin:12px 0}
+summary{cursor:pointer;font-weight:bold;padding:8px}
 </style>
 </head>
 <body>
-<div id="welcomePopup" class="popup" style="display:none;">
+
+<div id="welcomePopup" class="popup" style="display:none">
   <div class="popup-content">
     <h2>👋 Welcome to ClassVote!</h2>
-    <p>Your answers are private. No one can see who you voted for.</p>
-    <button onclick="document.getElementById('welcomePopup').style.display='none'">
-      Continue
-    </button>
+    <p>Your answers are not shown to classmates. Admins can review individual responses.</p>
+    <button onclick="document.getElementById('welcomePopup').style.display='none'">Continue</button>
   </div>
 </div>
+
 <main>
 <h1>🏆 ClassVote</h1>
 <p class="subtitle">Vote for your class legends!</p>
-
 <div id="message"></div>
 
 <section id="voting">
@@ -168,28 +88,17 @@ small{
     <p id="codeMessage"></p>
   </div>
 
-<div id="votingContent" class="hidden">
-  <div id="questionProgress"></div>
-
-  <div id="questions"></div>
-
-  <div style="display:flex;gap:10px;margin-top:20px">
-    <button id="prevQuestion" class="secondary" disabled>
-      ← Back
-    </button>
-
-    <button id="nextQuestion">
-      Next →
-    </button>
+  <div id="votingContent" class="hidden">
+    <div id="questionProgress"></div>
+    <div id="questions"></div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button id="prevQuestion" class="secondary" disabled>← Back</button>
+      <button id="nextQuestion">Next →</button>
+    </div>
+    <button id="submitVote" class="hidden">Submit my votes 🎉</button>
   </div>
-
-  <button id="submitVote" class="hidden">
-    Submit my votes 🎉
-  </button>
-</div>
-
-
 </section>
+
 <hr>
 
 <section id="login" class="hidden">
@@ -207,45 +116,64 @@ small{
     <h3>👥 Classmates</h3>
     <input id="newName" placeholder="Classmate name">
     <button id="addName">Add classmate</button>
+    <p><small>Assign groups using the dropdown. Let classmates confirm their own group.</small></p>
     <div id="nameList"></div>
   </div>
 
   <div class="card">
-    <h3>✨ Award categories</h3>
-    <input id="newQuestion" placeholder="Example: Who is the funniest?">
-    <button id="addQuestion">Add category</button>
+    <h3>✨ Create a question</h3>
+    <input id="newQuestion" placeholder="Write your question">
+
+    <label for="newQuestionType">Question type</label>
+    <select id="newQuestionType">
+      <option value="nomination">🏆 Nomination — choose a classmate</option>
+      <option value="yes_no">👍 Yes or No</option>
+      <option value="multiple_choice">🔘 Multiple choice</option>
+      <option value="written">✍️ Written answer</option>
+    </select>
+
+    <div id="optionsArea" class="hidden">
+      <label for="newOptions">Multiple-choice options (separate with commas)</label>
+      <input id="newOptions" placeholder="Option 1, Option 2, Option 3">
+    </div>
+
+    <label for="newTargetGroup">Who can answer?</label>
+    <select id="newTargetGroup">
+      <option value="all">Everyone</option>
+      <option value="girls">Girls only</option>
+      <option value="boys">Boys only</option>
+    </select>
+
+    <button id="addQuestion">Add question</button>
     <div id="questionList"></div>
   </div>
 
   <div class="card">
-  <h3>📊 Admin Reports</h3>
-
-
-  <details>
-    <summary>✅ Who answered everything</summary>
-    <div id="completionList"></div>
-  </details>
-
-  <details>
-    <summary>🏆 Overall leaderboard</summary>
-    <div id="overallResults"></div>
-  </details>
-
-  <details>
-    <summary>📊 Category results</summary>
-    <div id="categoryResults"></div>
-  </details>
-
-  <details>
-    <summary>👀 Who voted for whom</summary>
-    <div id="individualVotes"></div>
-  </details>
-    <button id="refreshVotes" class="secondary" style="margin-top:20px">
-  🔄 Refresh votes
-</button>
-</div>
-
+    <h3>📊 Admin Reports</h3>
+    <details>
+      <summary>✅ Who answered everything</summary>
+      <div id="completionList"></div>
+    </details>
+    <details>
+      <summary>🏆 Overall leaderboard</summary>
+      <div id="overallResults"></div>
+    </details>
+    <details>
+      <summary>📊 Category results</summary>
+      <div id="categoryResults"></div>
+    </details>
+    <details>
+      <summary>✍️ Written answers</summary>
+      <div id="writtenResults"></div>
+    </details>
+    <details>
+      <summary>👀 Who answered what</summary>
+      <div id="individualVotes"></div>
+    </details>
+    <button id="refreshVotes" class="secondary" style="margin-top:20px">🔄 Refresh votes</button>
+  </div>
 </section>
+
 <section id="resetPassword" class="hidden">
   <h2>🔑 Choose a new password</h2>
   <input id="newPassword" type="password" placeholder="New password">
@@ -253,53 +181,53 @@ small{
 </section>
 </main>
 
-<script
-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL =
-"https://hizetgeoucdktezbokab.supabase.co";
-const SUPABASE_KEY = 
-"sb_publishable_2WZ2SqKarfjnYmzH5Luffw_BbeQBXki";
+const SUPABASE_URL = "https://hizetgeoucdktezbokab.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2WZ2SqKarfjnYmzH5Luffw_BbeQBXki";
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let classmates = [];
 let questions = [];
+let allQuestions = [];
 let currentUser = null;
 let currentQuestionIndex = 0;
 let voteAnswers = {};
-  
+let voterProfile = null;
+let voterCode = "";
+
 const $ = id => document.getElementById(id);
 const say = message => $("message").textContent = message;
 
 function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
 
 async function loadPublicData() {
   const [c,q] = await Promise.all([
-    db.from("classmates").select("id,name").order("name"),
-    db.from("questions").select("id,question,active").eq("active",true)
+    db.from("classmates").select("id,name,answer_group").order("name"),
+    db.from("questions").select("id,question,active,question_type,target_group,options").eq("active",true)
   ]);
 
-  if (c.error || q.error) {
-    say("Classmates: " + (c.error?.message || "OK") +
-        " | Questions: " + (q.error?.message || "OK"));
-    return;
+  if(c.error || q.error) {
+    say("Could not load voting data: " + (c.error?.message || q.error?.message));
+    return false;
   }
 
   classmates = c.data || [];
-  questions = q.data || [];
-
-  currentQuestionIndex = 0;
-  voteAnswers = {};
-
-  renderQuestion();
+  allQuestions = q.data || [];
+  return true;
 }
+
+function getCurrentAnswer(question) {
+  return voteAnswers[question.id] || {nominee_id:"",answer_text:""};
+}
+
 function renderQuestion() {
-  if (!questions.length) {
-    $("questions").textContent = "No active questions.";
+  if(!questions.length) {
+    $("questions").textContent = "There are no questions available for you right now.";
     $("questionProgress").textContent = "";
     $("prevQuestion").disabled = true;
     $("nextQuestion").classList.add("hidden");
@@ -308,35 +236,59 @@ function renderQuestion() {
   }
 
   const q = questions[currentQuestionIndex];
+  const answer = getCurrentAnswer(q);
+  let inputHTML = "";
+
+  if(q.question_type === "nomination") {
+    inputHTML = `
+      <select id="currentAnswer">
+        <option value="">Choose someone</option>
+        ${classmates.filter(p => p.id !== voterProfile.classmate_id).map(p => `
+          <option value="${p.id}" ${answer.nominee_id === p.id ? "selected" : ""}>
+            ${escapeHTML(p.name)}
+          </option>`).join("")}
+      </select>`;
+  } else if(q.question_type === "yes_no") {
+    inputHTML = `
+      <select id="currentAnswer">
+        <option value="">Choose your answer</option>
+        <option value="Yes" ${answer.answer_text === "Yes" ? "selected" : ""}>Yes</option>
+        <option value="No" ${answer.answer_text === "No" ? "selected" : ""}>No</option>
+      </select>`;
+  } else if(q.question_type === "multiple_choice") {
+    const opts = Array.isArray(q.options) ? q.options : [];
+    inputHTML = `
+      <select id="currentAnswer">
+        <option value="">Choose an option</option>
+        ${opts.map(option => `
+          <option value="${escapeHTML(option)}" ${answer.answer_text === option ? "selected" : ""}>
+            ${escapeHTML(option)}
+          </option>`).join("")}
+      </select>`;
+  } else if(q.question_type === "written") {
+    inputHTML = `
+      <textarea id="currentAnswer" maxlength="1000"
+        placeholder="Write your answer (max 1000 characters)">${escapeHTML(answer.answer_text)}</textarea>`;
+  }
 
   $("questionProgress").innerHTML = `
     <p>Question ${currentQuestionIndex + 1} of ${questions.length}</p>
-    <div style="background:#ddd;height:8px;border-radius:8px;overflow:hidden">
+    <div style="background:#493963;height:8px;border-radius:8px;overflow:hidden">
       <div style="background:#8055d9;height:8px;width:${((currentQuestionIndex + 1) / questions.length) * 100}%"></div>
-    </div>
-  `;
+    </div>`;
 
   $("questions").innerHTML = `
     <div class="vote-card">
       <h3>${escapeHTML(q.question)}</h3>
-      <select id="currentNominee">
-        <option value="">Choose someone</option>
-        ${classmates.map(person => `
-          <option value="${person.id}" ${voteAnswers[q.id] === person.id ? "selected" : ""}>
-            ${escapeHTML(person.name)}
-          </option>
-        `).join("")}
-      </select>
-    </div>
-  `;
+      ${inputHTML}
+    </div>`;
 
-  $("currentNominee").onchange = () => {
-    voteAnswers[q.id] = $("currentNominee").value;
-  };
+  $("currentAnswer").onchange = saveCurrentAnswer;
+  $("currentAnswer").oninput = saveCurrentAnswer;
 
   $("prevQuestion").disabled = currentQuestionIndex === 0;
 
-  if (currentQuestionIndex === questions.length - 1) {
+  if(currentQuestionIndex === questions.length - 1) {
     $("nextQuestion").classList.add("hidden");
     $("submitVote").classList.remove("hidden");
   } else {
@@ -345,42 +297,50 @@ function renderQuestion() {
   }
 }
 
-$("nextQuestion").onclick = () => {
+function saveCurrentAnswer() {
   const q = questions[currentQuestionIndex];
-  const select = $("currentNominee");
+  const value = $("currentAnswer").value;
 
-  if (!select.value) {
-    say("Please choose someone before continuing.");
+  if(q.question_type === "nomination") {
+    voteAnswers[q.id] = {nominee_id:value,answer_text:""};
+  } else {
+    voteAnswers[q.id] = {nominee_id:null,answer_text:value};
+  }
+}
+
+function answerIsValid(q) {
+  const answer = getCurrentAnswer(q);
+  if(q.question_type === "nomination") return !!answer.nominee_id;
+  return !!answer.answer_text.trim();
+}
+
+$("nextQuestion").onclick = () => {
+  saveCurrentAnswer();
+  const q = questions[currentQuestionIndex];
+
+  if(!answerIsValid(q)) {
+    say("Please answer this question before continuing.");
     return;
   }
 
-  voteAnswers[q.id] = select.value;
-
-  if (currentQuestionIndex < questions.length - 1) {
+  say("");
+  if(currentQuestionIndex < questions.length - 1) {
     currentQuestionIndex++;
     renderQuestion();
   }
 };
 
 $("prevQuestion").onclick = () => {
-  const q = questions[currentQuestionIndex];
-  const select = $("currentNominee");
-
-  if (select) {
-    voteAnswers[q.id] = select.value;
-  }
-
-  if (currentQuestionIndex > 0) {
+  saveCurrentAnswer();
+  if(currentQuestionIndex > 0) {
     currentQuestionIndex--;
     renderQuestion();
   }
 };
 
-
-  $("unlockVoting").onclick = async () => {
+$("unlockVoting").onclick = async () => {
   const code = $("voter").value.trim();
-
-  if (!code) {
+  if(!code) {
     $("codeMessage").textContent = "Please enter your code.";
     return;
   }
@@ -388,59 +348,74 @@ $("prevQuestion").onclick = () => {
   $("unlockVoting").disabled = true;
   $("codeMessage").textContent = "Checking code...";
 
-  const {data, error} = await db.rpc("check_voting_code", {
-    p_code: code
-  });
+  const {data,error} = await db.rpc("get_voter_profile",{p_code:code});
 
   $("unlockVoting").disabled = false;
 
-  if (error || !data) {
+  if(error || !data || !data.length) {
     $("codeMessage").textContent = "Invalid code. Try again.";
     return;
   }
+
+  voterProfile = data[0];
+  voterCode = code;
+
+  const loaded = await loadPublicData();
+  if(!loaded) return;
+
+  questions = allQuestions.filter(q =>
+    q.target_group === "all" || q.target_group === voterProfile.answer_group
+  );
+
+  voteAnswers = {};
+  currentQuestionIndex = 0;
 
   $("codeMessage").textContent = "Code accepted!";
   $("votingContent").classList.remove("hidden");
   $("voter").disabled = true;
   $("unlockVoting").classList.add("hidden");
+  renderQuestion();
 };
 
-
 $("submitVote").onclick = async () => {
-  const code = $("voter").value.trim();
+  saveCurrentAnswer();
 
-  if (!code) return say("Please enter your voting code.");
-  if (!questions.length) return say("There are no active categories yet.");
+  if(!questions.length) return say("There are no questions for you.");
+  const missing = questions.some(q => !answerIsValid(q));
 
-  const missing = questions.some(q => !voteAnswers[q.id]);
-
-  if (missing) {
-    say("Please answer every category.");
-    return;
-  }
+  if(missing) return say("Please answer every question.");
 
   $("submitVote").disabled = true;
+  $("submitVote").textContent = "Saving...";
 
-  for (const question of questions) {
-    const {error} = await db.rpc("submit_vote_with_code", {
-      p_code: code,
-      p_nominee_id: voteAnswers[question.id],
-      p_question_id: question.id
+  for(const question of questions) {
+    const answer = getCurrentAnswer(question);
+    const {error} = await db.rpc("submit_vote_with_code",{
+      p_code:voterCode,
+      p_nominee_id:answer.nominee_id || null,
+      p_question_id:question.id,
+      p_answer_text:answer.answer_text || null
     });
 
-    if (error) {
-      say("Could not submit votes: " + error.message);
+    if(error) {
+      say("Could not save your answer: " + error.message);
       $("submitVote").disabled = false;
+      $("submitVote").textContent = "Submit my votes 🎉";
       return;
     }
   }
 
-  say("Your votes have been saved! You can still change them 🎉");
-  $("submitVote").textContent = "Save changed votes";
+  say("Your answers have been saved! You can still change them 🎉");
+  $("submitVote").textContent = "Save changed answers";
   $("submitVote").disabled = false;
 };
 
-
+$("newQuestionType").onchange = () => {
+  $("optionsArea").classList.toggle(
+    "hidden",
+    $("newQuestionType").value !== "multiple_choice"
+  );
+};
 
 $("loginButton").onclick = async () => {
   const {data,error} = await db.auth.signInWithPassword({
@@ -449,7 +424,7 @@ $("loginButton").onclick = async () => {
   });
   if(error) return say("Login failed. Check your email and password.");
   currentUser = data.user;
-  showAdmin();
+  await showAdmin();
 };
 
 async function showAdmin() {
@@ -466,31 +441,68 @@ $("logoutButton").onclick = async () => {
 };
 
 async function loadAdmin() {
-  await loadPublicData();
+  const loaded = await loadPublicData();
+  if(!loaded) return;
+
   $("nameList").innerHTML = classmates.map(c => `
     <div class="row">
       <span>${escapeHTML(c.name)}</span>
+      <select style="max-width:150px" onchange="updateGroup('${c.id}',this.value)">
+        <option value="unassigned" ${c.answer_group === "unassigned" ? "selected" : ""}>Not assigned</option>
+        <option value="girls" ${c.answer_group === "girls" ? "selected" : ""}>Girl</option>
+        <option value="boys" ${c.answer_group === "boys" ? "selected" : ""}>Boy</option>
+      </select>
       <button class="danger" onclick="removeName('${c.id}')">Delete</button>
     </div>`).join("");
 
-  const {data,error} = await db.from("questions").select("*").order("question");
-  if(error) { say("Could not load categories."); return; }
-  $("questionList").innerHTML = data.map(q => `
-    <div class="row">
-      <span>${escapeHTML(q.question)} ${q.active ? "🟢" : "⚪"}</span>
-      <button class="secondary" onclick="toggleQuestion('${q.id}',${!q.active})">
-        ${q.active ? "Close" : "Open"}
-      </button>
-      <button class="danger" onclick="removeQuestion('${q.id}')">Delete</button>
+  const {data,error} = await db.from("questions")
+    .select("*").order("question");
+
+  if(error) {
+    say("Could not load questions: " + error.message);
+    return;
+  }
+
+  $("questionList").innerHTML = (data || []).map(q => `
+    <div class="card">
+      <b>${escapeHTML(q.question)}</b>
+      <p><small>
+        ${escapeHTML(q.question_type)} ·
+        ${q.target_group === "all" ? "Everyone" : escapeHTML(q.target_group)} ·
+        ${q.active ? "🟢 Open" : "⚪ Closed"}
+      </small></p>
+      ${q.question_type === "multiple_choice"
+        ? `<small>Options: ${escapeHTML((q.options || []).join(", "))}</small>` : ""}
+      <div class="row">
+        <button class="secondary" onclick="toggleQuestion('${q.id}',${!q.active})">
+          ${q.active ? "Close" : "Open"}
+        </button>
+        <button class="danger" onclick="removeQuestion('${q.id}')">Delete</button>
+      </div>
     </div>`).join("");
+
   await loadVotes();
 }
+
+window.updateGroup = async (id,group) => {
+  const {error} = await db.from("classmates")
+    .update({answer_group:group}).eq("id",id);
+
+  if(error) {
+    say("Could not update group: " + error.message);
+    await loadAdmin();
+    return;
+  }
+  say("Classmate group updated.");
+};
 
 $("addName").onclick = async () => {
   const name = $("newName").value.trim();
   if(!name) return;
+
   const {error} = await db.from("classmates").insert({name});
   if(error) return say("Could not add name: " + error.message);
+
   $("newName").value = "";
   await loadAdmin();
 };
@@ -498,216 +510,191 @@ $("addName").onclick = async () => {
 window.removeName = async id => {
   if(!confirm("Delete this classmate?")) return;
   const {error} = await db.from("classmates").delete().eq("id",id);
-  if(error) return say("Could not delete. This classmate may already have votes.");
+  if(error) return say("Could not delete: " + error.message);
   await loadAdmin();
 };
 
 $("addQuestion").onclick = async () => {
   const question = $("newQuestion").value.trim();
-  if(!question) return;
-  const {error} = await db.from("questions").insert({question});
-  if(error) return say("Could not add category: " + error.message);
+  const question_type = $("newQuestionType").value;
+  const target_group = $("newTargetGroup").value;
+
+  if(!question) return say("Please write a question.");
+
+  let options = [];
+
+  if(question_type === "multiple_choice") {
+    options = $("newOptions").value.split(",")
+      .map(x => x.trim()).filter(Boolean);
+
+    if(options.length < 2) {
+      return say("Add at least two multiple-choice options.");
+    }
+  }
+
+  const {error} = await db.from("questions").insert({
+    question,question_type,target_group,options
+  });
+
+  if(error) return say("Could not add question: " + error.message);
+
   $("newQuestion").value = "";
+  $("newOptions").value = "";
+  $("newQuestionType").value = "nomination";
+  $("newTargetGroup").value = "all";
+  $("optionsArea").classList.add("hidden");
+  say("Question added!");
   await loadAdmin();
 };
 
 window.toggleQuestion = async (id,active) => {
   const {error} = await db.from("questions").update({active}).eq("id",id);
-  if(error) return say("Could not update category.");
+  if(error) return say("Could not update question: " + error.message);
   await loadAdmin();
 };
 
 window.removeQuestion = async id => {
-  if(!confirm("Delete this category?")) return;
+  if(!confirm("Delete this question and all its answers?")) return;
   const {error} = await db.from("questions").delete().eq("id",id);
- if(error) return say("Could not delete category: " + error.message);
+  if(error) return say("Could not delete question: " + error.message);
   await loadAdmin();
 };
 
 async function loadVotes() {
-  $("completionList").textContent = "Loading...";
-  $("overallResults").textContent = "Loading...";
-  $("categoryResults").textContent = "Loading...";
-  $("individualVotes").textContent = "Loading...";
+  for(const id of ["completionList","overallResults","categoryResults","writtenResults","individualVotes"]) {
+    $(id).textContent = "Loading...";
+  }
 
   try {
-    const [{data:v,error}, {data:c,error:ce}, {data:q,error:qe}] =
+    const [{data:v,error},{data:c,error:ce},{data:q,error:qe}] =
       await Promise.all([
-        db.from("votes")
-          .select("voter_id,nominee_id,question_id,created_at")
+        db.from("votes").select("voter_id,nominee_id,question_id,answer_text,created_at")
           .order("created_at",{ascending:false}),
-        db.from("classmates").select("id,name"),
-        db.from("questions").select("id,question,active")
+        db.from("classmates").select("id,name,answer_group"),
+        db.from("questions").select("*")
       ]);
 
-    if(error || ce || qe) {
-      throw new Error(error?.message || ce?.message || qe?.message);
-    }
+    if(error || ce || qe) throw new Error(error?.message || ce?.message || qe?.message);
 
     const votes = v || [];
     const people = c || [];
-    const allQuestions = q || [];
-    const activeQuestions = allQuestions.filter(x => x.active);
+    const qs = q || [];
+    const names = Object.fromEntries(people.map(p => [p.id,p.name]));
+    const activeQs = qs.filter(x => x.active);
 
-    const names = Object.fromEntries(
-      people.map(x => [x.id,x.name])
-    );
-
-    // 1. WHO ANSWERED EVERYTHING
-    const completed = people.filter(person =>
-      activeQuestions.length > 0 &&
-      activeQuestions.every(question =>
-        votes.some(vote =>
-          vote.voter_id === person.id &&
-          vote.question_id === question.id
-        )
-      )
-    );
+    const completed = people.filter(person => {
+      const eligible = activeQs.filter(question =>
+        question.target_group === "all" ||
+        question.target_group === person.answer_group
+      );
+      return eligible.length > 0 && eligible.every(question =>
+        votes.some(vote => vote.voter_id === person.id && vote.question_id === question.id)
+      );
+    });
 
     $("completionList").innerHTML = `
-      <p><b>${completed.length}</b> out of
-      <b>${people.length}</b> classmates completed every active category.</p>
-      ${completed.length
-        ? completed.map(person =>
-            `<p>✅ ${escapeHTML(person.name)}</p>`
-          ).join("")
-        : "Nobody has completed every active category yet."
-      }
+      <p><b>${completed.length}</b> classmates completed all questions available to their group.</p>
+      ${completed.map(p => `<p>✅ ${escapeHTML(p.name)}</p>`).join("") || "Nobody has completed all their questions yet."}
     `;
 
-    // 2. OVERALL LEADERBOARD
-    const totalVotes = votes.length;
-    const overallCounts = {};
-
-    people.forEach(person => {
-      overallCounts[person.id] = 0;
+    const nominationVotes = votes.filter(vote =>
+      qs.some(q => q.id === vote.question_id && q.question_type === "nomination")
+    );
+    const counts = {};
+    people.forEach(p => counts[p.id] = 0);
+    nominationVotes.forEach(vote => {
+      if(vote.nominee_id) counts[vote.nominee_id] = (counts[vote.nominee_id] || 0) + 1;
     });
 
-    votes.forEach(vote => {
-      overallCounts[vote.nominee_id] =
-        (overallCounts[vote.nominee_id] || 0) + 1;
-    });
-
-    const leaderboard = Object.entries(overallCounts)
-      .sort((a,b) => b[1] - a[1])
-      .map(([id,count],index) => {
-        const percent = totalVotes
-          ? Math.round(count / totalVotes * 100)
-          : 0;
-
-        return `
-          <div style="margin:15px 0;padding:12px;background:#211a35;border-radius:12px">
-            <b>${index + 1}. ${escapeHTML(names[id] || "Unknown")}</b>
-            <p>${count} votes (${percent}%)</p>
-            <div style="background:#493963;border-radius:10px;height:10px;overflow:hidden">
-              <div style="width:${percent}%;background:#8055d9;height:10px"></div>
-            </div>
-          </div>
-        `;
-      }).join("");
-
+    const total = nominationVotes.length;
     $("overallResults").innerHTML = `
-      <p>Total votes: ${totalVotes}</p>
-      ${leaderboard || "No votes yet."}
+      <p>Total nomination votes: ${total}</p>
+      ${Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([id,count],i) => `
+        <p><b>${i+1}. ${escapeHTML(names[id] || "Unknown")}</b> — ${count} votes</p>
+      `).join("")}
     `;
 
-    // 3. CATEGORY RESULTS
-    $("categoryResults").innerHTML = allQuestions.map(question => {
-      const categoryVotes = votes.filter(
-        vote => vote.question_id === question.id
-      );
+    $("categoryResults").innerHTML = qs.map(question => {
+      const categoryVotes = votes.filter(vote => vote.question_id === question.id);
 
-      const counts = {};
+      if(question.question_type === "written") {
+        return `<div><h4>${escapeHTML(question.question)}</h4><small>Written answers are private to admins.</small></div>`;
+      }
 
+      const tally = {};
       categoryVotes.forEach(vote => {
-        counts[vote.nominee_id] =
-          (counts[vote.nominee_id] || 0) + 1;
+        const key = question.question_type === "nomination"
+          ? vote.nominee_id : vote.answer_text;
+        if(key) tally[key] = (tally[key] || 0) + 1;
       });
 
-      const results = Object.entries(counts)
-        .sort((a,b) => b[1] - a[1])
-        .map(([id,count]) => {
-          const percent = Math.round(
-            count / categoryVotes.length * 100
-          );
-
-          return `
-            <p><b>${escapeHTML(names[id] || "Unknown")}</b>
-            — ${count} votes (${percent}%)</p>
-            <div style="background:#493963;border-radius:10px;height:10px;overflow:hidden">
-              <div style="width:${percent}%;background:#8055d9;height:10px"></div>
-            </div>
-          `;
+      const rows = Object.entries(tally).sort((a,b) => b[1]-a[1])
+        .map(([key,count]) => {
+          const label = question.question_type === "nomination"
+            ? (names[key] || "Unknown") : key;
+          return `<p><b>${escapeHTML(label)}</b> — ${count} votes</p>`;
         }).join("");
 
-      return `
-        <div style="margin:15px 0">
+      return `<div style="margin:15px 0">
+        <h4>${escapeHTML(question.question)}</h4>
+        <p>Total answers: ${categoryVotes.length}</p>
+        ${rows || "No answers yet."}
+      </div>`;
+    }).join("") || "No questions found.";
+
+    $("writtenResults").innerHTML = qs.filter(q => q.question_type === "written")
+      .map(question => {
+        const answers = votes.filter(v => v.question_id === question.id);
+        return `<div style="margin:15px 0">
           <h4>${escapeHTML(question.question)}</h4>
-          <p>Total votes: ${categoryVotes.length}</p>
-          ${results || "No votes yet."}
-        </div>
-      `;
-    }).join("") || "No categories found.";
+          ${answers.map(v => `
+            <div class="vote-card">
+              <b>${escapeHTML(names[v.voter_id] || "Unknown")}</b>
+              <p>${escapeHTML(v.answer_text)}</p>
+            </div>`).join("") || "No written answers yet."}
+        </div>`;
+      }).join("") || "No written questions.";
 
-    // 4. WHO VOTED FOR WHOM
-    $("individualVotes").innerHTML = allQuestions.map(question => {
-      const categoryVotes = votes.filter(
-        vote => vote.question_id === question.id
-      );
-
-      const individualList = categoryVotes.map(vote => `
-        <p>
-          <b>${escapeHTML(names[vote.voter_id] || "Unknown")}</b>
-          voted for
-          <b>${escapeHTML(names[vote.nominee_id] || "Unknown")}</b>
-        </p>
-      `).join("");
-
-      return `
-        <details style="margin:12px 0">
-          <summary>${escapeHTML(question.question)}</summary>
-          <p>Total votes: ${categoryVotes.length}</p>
-          ${individualList || "No votes yet."}
-        </details>
-      `;
-    }).join("") || "No categories found.";
+    $("individualVotes").innerHTML = qs.map(question => {
+      const answers = votes.filter(v => v.question_id === question.id);
+      return `<details style="margin:12px 0">
+        <summary>${escapeHTML(question.question)}</summary>
+        ${answers.map(v => {
+          let answer = question.question_type === "nomination"
+            ? "voted for " + (names[v.nominee_id] || "Unknown")
+            : "answered: " + (v.answer_text || "");
+          return `<p><b>${escapeHTML(names[v.voter_id] || "Unknown")}</b> ${escapeHTML(answer)}</p>`;
+        }).join("") || "No answers yet."}
+      </details>`;
+    }).join("") || "No questions found.";
 
   } catch(error) {
     const message = "Error: " + error.message;
-
-    $("completionList").textContent = message;
-    $("overallResults").textContent = message;
-    $("categoryResults").textContent = message;
-    $("individualVotes").textContent = message;
+    for(const id of ["completionList","overallResults","categoryResults","writtenResults","individualVotes"]) {
+      $(id).textContent = message;
+    }
   }
 }
-
-
 
 $("refreshVotes").onclick = async () => {
   $("refreshVotes").disabled = true;
   $("refreshVotes").textContent = "Refreshing...";
-
   await loadVotes();
-
-  $("refreshVotes").textContent = "Refresh votes";
+  $("refreshVotes").textContent = "🔄 Refresh votes";
   $("refreshVotes").disabled = false;
 };
 
-
 async function start() {
-  await loadPublicData();
-
   const {data} = await db.auth.getSession();
 
-  if (window.location.hash.includes("type=recovery") && data.session) {
+  if(window.location.hash.includes("type=recovery") && data.session) {
     $("resetPassword").classList.remove("hidden");
     $("login").classList.add("hidden");
     $("voting").classList.add("hidden");
     return;
   }
 
-  if (window.location.search.includes("admin")) {
+  if(window.location.search.includes("admin")) {
     $("login").classList.remove("hidden");
   }
 
@@ -717,8 +704,8 @@ async function start() {
   }
 }
 
-  db.auth.onAuthStateChange((event, session) => {
-  if (event === "PASSWORD_RECOVERY") {
+db.auth.onAuthStateChange((event,session) => {
+  if(event === "PASSWORD_RECOVERY") {
     $("resetPassword").classList.remove("hidden");
     $("login").classList.add("hidden");
     $("voting").classList.add("hidden");
@@ -727,16 +714,10 @@ async function start() {
 
 $("savePassword").onclick = async () => {
   const password = $("newPassword").value;
+  if(password.length < 8) return say("Password must be at least 8 characters.");
 
-  if (password.length < 8) {
-    return say("Password must be at least 8 characters.");
-  }
-
-  const { data, error } = await db.auth.updateUser({
-    password: password
-  });
-
-  if (error) return say("Error: " + error.message);
+  const {error} = await db.auth.updateUser({password});
+  if(error) return say("Error: " + error.message);
 
   await db.auth.signOut();
   $("resetPassword").classList.add("hidden");
@@ -745,10 +726,12 @@ $("savePassword").onclick = async () => {
   $("newPassword").value = "";
   say("Password updated successfully! 🎉");
 };
+
 start();
-if (!localStorage.getItem("welcomeSeen")) {
-  document.getElementById("welcomePopup").style.display = "flex";
-  localStorage.setItem("welcomeSeen", "yes");
+
+if(!localStorage.getItem("welcomeSeen")) {
+  $("welcomePopup").style.display = "flex";
+  localStorage.setItem("welcomeSeen","yes");
 }
 </script>
 </body>
