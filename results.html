@@ -6,11 +6,83 @@
   <title>ClassVote – Results</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 25px 15px;
+      font-family: Arial, sans-serif;
+      background: #100d18;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      color: #c7a5ff;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+
+    #results {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .result-card {
+      background: #211a30;
+      border: 1px solid #493963;
+      border-radius: 14px;
+      padding: 18px;
+      margin: 20px 0;
+    }
+
+    .result-card h2 {
+      color: #d5baff;
+      font-size: 20px;
+    }
+
+    .result-row {
+      margin: 18px 0;
+    }
+
+    .result-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 7px;
+    }
+
+    .bar {
+      background: #42384f;
+      height: 11px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      background: #9865e8;
+      height: 100%;
+      border-radius: 20px;
+    }
+
+    .empty {
+      color: #aaa;
+    }
+  </style>
 </head>
+
 <body>
 
   <h1>🏆 ClassVote Results</h1>
-  <p>See how your class voted!</p>
+  <p class="subtitle">See how your class voted!</p>
 
   <div id="results">Loading results...</div>
 
@@ -18,87 +90,113 @@
     const SUPABASE_URL = "https://hizetgeoucdktezbokab.supabase.co";
     const SUPABASE_KEY = "sb_publishable_2WZ2SqKarfjnYmzH5Luffw_BbeQBXki";
 
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
-}
-
-async function loadPublicResults() {
-  const output = document.getElementById("results");
-  output.textContent = "Loading results...";
-
-  try {
-    const [votesResult, questionsResult, classmatesResult] =
-      await Promise.all([
-        db.rpc("get_public_results"),
-        db.from("questions").select("id,question"),
-        db.from("classmates").select("id,name")
-      ]);
-
-    if (votesResult.error) throw votesResult.error;
-    if (questionsResult.error) throw questionsResult.error;
-    if (classmatesResult.error) throw classmatesResult.error;
-
-    const votes = votesResult.data || [];
-    const questions = questionsResult.data || [];
-    const names = Object.fromEntries(
-      (classmatesResult.data || []).map(person => [
-        person.id, person.name
-      ])
+    const db = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
     );
 
-    output.innerHTML = questions.map(question => {
-      const categoryVotes = votes.filter(
-        vote => vote.question_id === question.id
-      );
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
 
-      const total = categoryVotes.reduce(
-        (sum, vote) => sum + Number(vote.vote_count), 0
-      );
+    async function loadPublicResults() {
+      const output = document.getElementById("results");
+      output.textContent = "Loading results...";
 
-      const results = categoryVotes
-        .sort((a, b) => Number(b.vote_count) - Number(a.vote_count))
-        .map(vote => {
-          const count = Number(vote.vote_count);
-          const percent = total
-            ? Math.round(count / total * 100)
-            : 0;
+      try {
+        const [votesResult, questionsResult, classmatesResult] =
+          await Promise.all([
+            db.rpc("get_public_results"),
+            db.from("questions").select(
+              "id,question,question_type,active"
+            ).eq("active", true),
+            db.from("classmates").select("id,name")
+          ]);
+
+        if (votesResult.error) throw votesResult.error;
+        if (questionsResult.error) throw questionsResult.error;
+        if (classmatesResult.error) throw classmatesResult.error;
+
+        const votes = votesResult.data || [];
+        const questions = questionsResult.data || [];
+
+        const names = Object.fromEntries(
+          (classmatesResult.data || []).map(person => [
+            person.id,
+            person.name
+          ])
+        );
+
+        if (!questions.length) {
+          output.textContent = "No questions found.";
+          return;
+        }
+
+        output.innerHTML = questions.map(question => {
+          const categoryVotes = votes.filter(
+            vote => vote.question_id === question.id
+          );
+
+          const total = categoryVotes.reduce(
+            (sum, vote) => sum + Number(vote.vote_count),
+            0
+          );
+
+          const sortedVotes = [...categoryVotes].sort(
+            (a, b) => Number(b.vote_count) - Number(a.vote_count)
+          );
+
+          const results = sortedVotes.map(vote => {
+            const count = Number(vote.vote_count);
+            const percent = total
+              ? Math.round(count / total * 100)
+              : 0;
+
+            let answerLabel = vote.answer;
+
+            if (question.question_type === "nomination") {
+              answerLabel = names[vote.answer] || "Unknown";
+            }
+
+            return `
+              <div class="result-row">
+                <div class="result-info">
+                  <b>${escapeHTML(answerLabel || "No answer")}</b>
+                  <span>${count} votes (${percent}%)</span>
+                </div>
+
+                <div class="bar">
+                  <div class="bar-fill"
+                    style="width:${percent}%">
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
 
           return `
-            <div style="margin:15px 0">
-              <b>${escapeHTML(names[vote.nominee_id] || "Unknown")}</b>
-              — ${count} votes (${percent}%)
-              <div style="background:#ddd;border-radius:10px;height:10px;overflow:hidden">
-                <div style="width:${percent}%;background:#8055d9;height:10px"></div>
-              </div>
-            </div>
+            <section class="result-card">
+              <h2>${escapeHTML(question.question)}</h2>
+              <p>Total votes: ${total}</p>
+              ${results || '<p class="empty">No votes yet.</p>'}
+            </section>
           `;
         }).join("");
 
-      return `
-        <section style="margin:20px 0;padding:18px;border:1px solid #493963;border-radius:14px">
-          <h2>${escapeHTML(question.question)}</h2>
-          <p>Total votes: ${total}</p>
-          ${results || "No votes yet."}
-        </section>
-      `;
-    }).join("") || "No categories found.";
+      } catch (error) {
+        output.textContent =
+          "Could not load results: " + error.message;
+      }
+    }
 
-  } catch (error) {
-    output.textContent = "Could not load results: " + error.message;
-  }
-}
-
-loadPublicResults();
-
+    loadPublicResults();
   </script>
 
 </body>
 </html>
-
