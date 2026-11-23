@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClassVote – Results</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <h1>🏆 ClassVote Results</h1>
+  <p>See how your class voted!</p>
+
+  <div id="results">Loading results...</div>
+
+  <script>
+    const SUPABASE_URL = "https://hizetgeoucdktezbokab.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2WZ2SqKarfjnYmzH5Luffw_BbeQBXki";
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+async function loadPublicResults() {
+  const output = document.getElementById("results");
+  output.textContent = "Loading results...";
+
+  try {
+    const [votesResult, questionsResult, classmatesResult] =
+      await Promise.all([
+        db.rpc("get_public_results"),
+        db.from("questions").select("id,question"),
+        db.from("classmates").select("id,name")
+      ]);
+
+    if (votesResult.error) throw votesResult.error;
+    if (questionsResult.error) throw questionsResult.error;
+    if (classmatesResult.error) throw classmatesResult.error;
+
+    const votes = votesResult.data || [];
+    const questions = questionsResult.data || [];
+    const names = Object.fromEntries(
+      (classmatesResult.data || []).map(person => [
+        person.id, person.name
+      ])
+    );
+
+    output.innerHTML = questions.map(question => {
+      const categoryVotes = votes.filter(
+        vote => vote.question_id === question.id
+      );
+
+      const total = categoryVotes.reduce(
+        (sum, vote) => sum + Number(vote.vote_count), 0
+      );
+
+      const results = categoryVotes
+        .sort((a, b) => Number(b.vote_count) - Number(a.vote_count))
+        .map(vote => {
+          const count = Number(vote.vote_count);
+          const percent = total
+            ? Math.round(count / total * 100)
+            : 0;
+
+          return `
+            <div style="margin:15px 0">
+              <b>${escapeHTML(names[vote.nominee_id] || "Unknown")}</b>
+              — ${count} votes (${percent}%)
+              <div style="background:#ddd;border-radius:10px;height:10px;overflow:hidden">
+                <div style="width:${percent}%;background:#8055d9;height:10px"></div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+      return `
+        <section style="margin:20px 0;padding:18px;border:1px solid #493963;border-radius:14px">
+          <h2>${escapeHTML(question.question)}</h2>
+          <p>Total votes: ${total}</p>
+          ${results || "No votes yet."}
+        </section>
+      `;
+    }).join("") || "No categories found.";
+
+  } catch (error) {
+    output.textContent = "Could not load results: " + error.message;
+  }
+}
+
+loadPublicResults();
+
+  </script>
+
+</body>
+</html>
 
