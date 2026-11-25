@@ -592,7 +592,7 @@ $("addQuestion").onclick = async () => {
 }
 
 max_choices = Number($("newMaxChoices").value) || 1;
-alert("Maximum choices entered: " + $("newMaxChoices").value);
+
 
 if(max_choices > options.length) {
   return say("Maximum choices cannot exceed the number of options.");
