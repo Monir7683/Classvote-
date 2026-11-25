@@ -322,68 +322,6 @@ function renderQuestion() {
 }
 
 
-  const q = questions[currentQuestionIndex];
-  const answer = getCurrentAnswer(q);
-  let inputHTML = "";
-
-  if(q.question_type === "nomination") {
-    inputHTML = `
-      <select id="currentAnswer">
-        <option value="">Choose someone</option>
-        ${classmates.filter(p => p.id !== voterProfile.classmate_id).map(p => `
-          <option value="${p.id}" ${answer.nominee_id === p.id ? "selected" : ""}>
-            ${escapeHTML(p.name)}
-          </option>`).join("")}
-      </select>`;
-  } else if(q.question_type === "yes_no") {
-    inputHTML = `
-      <select id="currentAnswer">
-        <option value="">Choose your answer</option>
-        <option value="Yes" ${answer.answer_text === "Yes" ? "selected" : ""}>Yes</option>
-        <option value="No" ${answer.answer_text === "No" ? "selected" : ""}>No</option>
-      </select>`;
-  } else if(q.question_type === "multiple_choice") {
-    const opts = Array.isArray(q.options) ? q.options : [];
-    inputHTML = `
-      <select id="currentAnswer">
-        <option value="">Choose an option</option>
-        ${opts.map(option => `
-          <option value="${escapeHTML(option)}" ${answer.answer_text === option ? "selected" : ""}>
-            ${escapeHTML(option)}
-          </option>`).join("")}
-      </select>`;
-  } else if(q.question_type === "written") {
-    inputHTML = `
-      <textarea id="currentAnswer" maxlength="1000"
-        placeholder="Write your answer (max 1000 characters)">${escapeHTML(answer.answer_text)}</textarea>`;
-  }
-
-  $("questionProgress").innerHTML = `
-    <p>Question ${currentQuestionIndex + 1} of ${questions.length}</p>
-    <div style="background:#493963;height:8px;border-radius:8px;overflow:hidden">
-      <div style="background:#8055d9;height:8px;width:${((currentQuestionIndex + 1) / questions.length) * 100}%"></div>
-    </div>`;
-
-  $("questions").innerHTML = `
-    <div class="vote-card">
-      <h3>${escapeHTML(q.question)}</h3>
-      ${inputHTML}
-    </div>`;
-
-  $("currentAnswer").onchange = saveCurrentAnswer;
-  $("currentAnswer").oninput = saveCurrentAnswer;
-
-  $("prevQuestion").disabled = currentQuestionIndex === 0;
-
-  if(currentQuestionIndex === questions.length - 1) {
-    $("nextQuestion").classList.add("hidden");
-    $("submitVote").classList.remove("hidden");
-  } else {
-    $("nextQuestion").classList.remove("hidden");
-    $("submitVote").classList.add("hidden");
-  }
-}
-
 function saveCurrentAnswer(event) {
   const q = questions[currentQuestionIndex];
 
