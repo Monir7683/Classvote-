@@ -587,7 +587,7 @@ $("addQuestion").onclick = async () => {
     options = $("newOptions").value.split(",")
       .map(x => x.trim()).filter(Boolean);
 
-   if options.length < 2) {
+   if (options.length < 2) {
   return say("Add at least two multiple-choice options.");
 }
 
