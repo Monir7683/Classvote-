@@ -819,7 +819,10 @@ async function start() {
     await showAdmin();
   }
 }
-
+  if (window.location.search.includes("admin")) {
+    $("voting").classList.add("hidden");
+    $("login").classList.remove("hidden");
+  }
 db.auth.onAuthStateChange((event,session) => {
   if(event === "PASSWORD_RECOVERY") {
     $("resetPassword").classList.remove("hidden");
