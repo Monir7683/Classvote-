@@ -111,6 +111,12 @@ summary{cursor:pointer;font-weight:bold;padding:8px}
 <section id="admin" class="hidden">
   <h2>⚙️ Admin dashboard</h2>
   <button class="secondary" id="logoutButton">Log out</button>
+  <div class="card">
+  <h3>🗳️ Voting access</h3>
+  <p id="votingStatus">Loading voting status...</p>
+  <button id="openVoting">🟢 Open voting</button>
+  <button id="closeVoting" class="danger">🔒 Close voting</button>
+</div>
 
   <div class="card">
     <h3>👥 Classmates</h3>
@@ -486,11 +492,65 @@ $("loginButton").onclick = async () => {
   await showAdmin();
 };
 
+  async function loadVotingStatus() {
+  const {data, error} = await db
+    .from("voting_control")
+    .select("is_open")
+    .eq("id", 1)
+    .single();
+
+  if(error || !data) {
+    $("voter").disabled = true;
+    $("unlockVoting").disabled = true;
+    $("codeMessage").textContent = "Could not check voting status. Please try again later.";
+    $("votingStatus").textContent = "Could not load voting status.";
+    return;
+  }
+
+  $("voter").disabled = !data.is_open;
+  $("unlockVoting").disabled = !data.is_open;
+
+  $("votingStatus").textContent = data.is_open
+    ? "🟢 Voting is OPEN"
+    : "🔒 Voting is CLOSED";
+
+  $("codeMessage").textContent = data.is_open
+    ? "Voting is open. Enter your private code."
+    : "Voting is currently closed. Please wait for the admin.";
+}
+
 async function showAdmin() {
   $("login").classList.add("hidden");
   $("admin").classList.remove("hidden");
   await loadAdmin();
 }
+$("openVoting").onclick = async () => {
+  const {error} = await db
+    .from("voting_control")
+    .update({is_open:true})
+    .eq("id",1);
+
+  if(error) {
+    alert("Could not open voting: " + error.message);
+    return;
+  }
+
+  await loadVotingStatus();
+};
+
+$("closeVoting").onclick = async () => {
+  const {error} = await db
+    .from("voting_control")
+    .update({is_open:false})
+    .eq("id",1);
+
+  if(error) {
+    alert("Could not close voting: " + error.message);
+    return;
+  }
+
+  await loadVotingStatus();
+};
 
 $("logoutButton").onclick = async () => {
   await db.auth.signOut();
@@ -770,6 +830,8 @@ async function start() {
     $("login").classList.remove("hidden");
   }
 
+  await loadVotingStatus();
+  
   if(data.session) {
     currentUser = data.session.user;
     await showAdmin();
