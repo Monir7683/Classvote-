@@ -587,14 +587,15 @@ $("addQuestion").onclick = async () => {
     options = $("newOptions").value.split(",")
       .map(x => x.trim()).filter(Boolean);
 
-    if(options.length < 2) {
-    max_choices = Number($("newMaxChoices").value) || 1;
+   if(options.length < 2) {
+  return say("Add at least two multiple-choice options.");
+}
+
+max_choices = Number($("newMaxChoices").value) || 1;
 
 if(max_choices > options.length) {
   return say("Maximum choices cannot exceed the number of options.");
 }
-      return say("Add at least two multiple-choice options.");
-    }
   }
 
 const {error} = await db.from("questions").insert({
