@@ -136,6 +136,10 @@ summary{cursor:pointer;font-weight:bold;padding:8px}
       <label for="newOptions">Multiple-choice options (separate with commas)</label>
       <input id="newOptions" placeholder="Option 1, Option 2, Option 3">
     </div>
+    <div id="maxChoicesArea" class="hidden">
+  <label for="newMaxChoices">Maximum number of choices</label>
+  <input id="newMaxChoices" type="number" min="1" value="1">
+</div>
 
     <label for="newTargetGroup">Who can answer?</label>
     <select id="newTargetGroup">
@@ -208,7 +212,7 @@ function escapeHTML(value) {
 async function loadPublicData() {
   const [c,q] = await Promise.all([
     db.from("classmates").select("id,name,answer_group").order("name"),
-    db.from("questions").select("id,question,active,question_type,target_group,options").eq("active",true)
+    db.from("questions").select("id,question,active,question_type,target_group,options,max_choices").eq("active",true)
   ]);
 
   if(c.error || q.error) {
@@ -465,10 +469,11 @@ $("submitVote").onclick = async () => {
 };
 
 $("newQuestionType").onchange = () => {
-  $("optionsArea").classList.toggle(
-    "hidden",
-    $("newQuestionType").value !== "multiple_choice"
-  );
+  const isMultipleChoice =
+    $("newQuestionType").value === "multiple_choice";
+
+  $("optionsArea").classList.toggle("hidden", !isMultipleChoice);
+  $("maxChoicesArea").classList.toggle("hidden", !isMultipleChoice);
 };
 
 $("loginButton").onclick = async () => {
@@ -577,23 +582,35 @@ $("addQuestion").onclick = async () => {
 
   let options = [];
 
+  let max_choices = 1; 
   if(question_type === "multiple_choice") {
     options = $("newOptions").value.split(",")
       .map(x => x.trim()).filter(Boolean);
 
     if(options.length < 2) {
+    max_choices = Number($("newMaxChoices").value) || 1;
+
+if(max_choices > options.length) {
+  return say("Maximum choices cannot exceed the number of options.");
+}
       return say("Add at least two multiple-choice options.");
     }
   }
 
-  const {error} = await db.from("questions").insert({
-    question,question_type,target_group,options
-  });
+const {error} = await db.from("questions").insert({
+  question,
+  question_type,
+  target_group,
+  options,
+  max_choices
+});
 
   if(error) return say("Could not add question: " + error.message);
 
   $("newQuestion").value = "";
   $("newOptions").value = "";
+  $("newMaxChoices").value = "1";
+$("maxChoicesArea").classList.add("hidden");
   $("newQuestionType").value = "nomination";
   $("newTargetGroup").value = "all";
   $("optionsArea").classList.add("hidden");
