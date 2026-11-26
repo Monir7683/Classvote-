@@ -431,8 +431,26 @@ $("unlockVoting").onclick = async () => {
     q.target_group === "all" || q.target_group === voterProfile.answer_group
   );
 
-  voteAnswers = {};
-  currentQuestionIndex = 0;
+voteAnswers = {};
+
+const {data:savedVotes, error:savedVotesError} = await db.rpc(
+  "get_my_votes",
+  {p_code:code}
+);
+
+if(savedVotesError) {
+  $("codeMessage").textContent = "Could not load your previous answers.";
+  return;
+}
+
+for(const vote of savedVotes || []) {
+  voteAnswers[vote.question_id] = {
+    nominee_id: vote.nominee_id || "",
+    answer_text: vote.answer_text || ""
+  };
+}
+
+currentQuestionIndex = 0;
 
   $("codeMessage").textContent = "Code accepted!";
   $("votingContent").classList.remove("hidden");
