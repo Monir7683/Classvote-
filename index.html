@@ -771,17 +771,47 @@ async function loadVotes() {
         return `<div><h4>${escapeHTML(question.question)}</h4><small>Written answers are private to admins.</small></div>`;
       }
 
-      const tally = {};
-      categoryVotes.forEach(vote => {
-        const key = question.question_type === "nomination"
-          ? vote.nominee_id : vote.answer_text;
-        if(key) tally[key] = (tally[key] || 0) + 1;
-      });
+const tally = {};
+
+categoryVotes.forEach(vote => {
+  let key = "";
+
+  if(question.question_type === "nomination") {
+    key = vote.nominee_id || "";
+  } else if(question.question_type === "multiple_choice") {
+    try {
+      const selected = JSON.parse(vote.answer_text || "[]");
+
+      key = Array.isArray(selected)
+        ? JSON.stringify(selected.sort())
+        : vote.answer_text || "";
+    } catch {
+      key = vote.answer_text || "";
+    }
+  } else {
+    key = vote.answer_text || "";
+  }
+
+  if(key) tally[key] = (tally[key] || 0) + 1;
+});
+
 
       const rows = Object.entries(tally).sort((a,b) => b[1]-a[1])
         .map(([key,count]) => {
-          const label = question.question_type === "nomination"
-            ? (names[key] || "Unknown") : key;
+  let label = key;
+
+if(question.question_type === "nomination") {
+  label = names[key] || "Unknown";
+} else if(question.question_type === "multiple_choice") {
+  try {
+    const selected = JSON.parse(key);
+    if(Array.isArray(selected)) {
+      label = selected.join(" + ");
+    }
+  } catch {
+    label = key;
+  }
+}
           return `<p><b>${escapeHTML(label)}</b> — ${count} votes</p>`;
         }).join("");
 
