@@ -151,7 +151,18 @@
           const sortedVotes = [...categoryVotes].sort(
             (a, b) => Number(b.vote_count) - Number(a.vote_count)
           );
-
+if(question.question_type === "written") {
+  return `
+    <section class="result-card">
+      <h2>${escapeHTML(question.question)}</h2>
+      ${categoryVotes.map(vote => `
+        <div class="result-row">
+          <p>${escapeHTML(vote.answer || "")}</p>
+        </div>
+      `).join("") || '<p class="empty">No answers yet.</p>'}
+    </section>
+  `;
+}
           const results = sortedVotes.map(vote => {
             const count = Number(vote.vote_count);
             const percent = total
