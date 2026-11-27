@@ -158,11 +158,20 @@
               ? Math.round(count / total * 100)
               : 0;
 
-            let answerLabel = vote.answer;
+let answerLabel = vote.answer;
 
-            if (question.question_type === "nomination") {
-              answerLabel = names[vote.answer] || "Unknown";
-            }
+if (question.question_type === "nomination") {
+  answerLabel = names[vote.answer] || "Unknown";
+} else if (question.question_type === "multiple_choice") {
+  try {
+    const selected = JSON.parse(vote.answer);
+    if (Array.isArray(selected)) {
+      answerLabel = selected.join(" + ");
+    }
+  } catch {
+    answerLabel = vote.answer;
+  }
+}
 
             return `
               <div class="result-row">
